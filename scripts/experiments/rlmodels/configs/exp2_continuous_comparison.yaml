@@ -1,0 +1,79 @@
+# Experiment 2: Continuous Model Comparison
+experiment:
+  name: "Continuous Model Comparison"
+  id: "exp2"
+  description: "Test if continuous action models can perform object selection"
+
+models:
+  - name: "DDPG"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/ddpg_pendulum_actor.pth"
+    type: "pytorch"  # Changed from "ddpg" to "pytorch" - it's a raw PyTorch actor network
+    source_env: "Pendulum-v1"
+    source_file: "PV1_actor.pth"
+    state_dim: 3  # Pendulum state dim
+    action_dim: 1  # Pendulum action dim
+    episodes: 99
+
+  - name: "TD3"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/td3_bipedalwalker_actor.pth"
+    type: "pytorch"  # Changed from "td3" to "pytorch" - it's a raw PyTorch actor network
+    source_env: "BipedalWalkerHardcore-v3"
+    source_file: "BWHv3_actor5000.pth"  # Checkpoint 5000
+    state_dim: 24
+    action_dim: 4
+    episodes: 99
+
+  - name: "PPO-Continuous"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/ppo_continuous_pendulum_actor.pth"
+    type: "pytorch"  # Changed from "ppo" to "pytorch" - it's a raw PyTorch actor network
+    source_env: "Pendulum-v1"
+    source_file: "PV1_actor100.pth"  # Checkpoint 100
+    state_dim: 3
+    action_dim: 1
+    episodes: 99
+
+  - name: "SAC-Continuous"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/sac_continuous_bipedalwalker_actor.pth"
+    type: "pytorch"  # Changed from "sac" to "pytorch" - it's a raw PyTorch actor network
+    source_env: "BipedalWalkerHardcore-v3"
+    source_file: "BWHv3_actor1400.pth"  # Checkpoint 1400
+    state_dim: 24
+    action_dim: 4
+    episodes: 99
+
+testing:
+  episodes_per_model: 99
+  grid_size: 4  # 4x4 grid (16 cells) - MATCHES custom_ddqn_grid4_cubes9.pt
+  num_cubes: 9  # 9 cubes (56% density) - MATCHES custom_ddqn_grid4_cubes9.pt
+  num_obstacles: 5  # 4-6 obstacles (randomized per episode) - MUCH MORE CHALLENGING!
+  max_steps_per_episode: 30  # Reduced from 50 to add time pressure
+  headless: true
+
+state_adapter:
+  type: "feature_aggregation"
+  input_dim: 96  # 4x4 grid = 16 objects × 6 features = 96D
+  output_dim: 8
+  
+action_adapter:
+  type: "continuous_to_discrete"
+  method: "nearest_object"
+  
+metrics:
+  - success_rate
+  - avg_reward
+  - avg_steps
+  - collision_rate
+  - invalid_actions
+  - inference_time
+  
+wandb:
+  project: "exp-rl-models"
+  entity: "falgunsinha"
+  tags: ["continuous", "comparison", "pretrained"]
+  
+output:
+  results_dir: "results/exp2_continuous_comparison"
+  save_csv: true
+  save_json: true
+  save_plots: true
+

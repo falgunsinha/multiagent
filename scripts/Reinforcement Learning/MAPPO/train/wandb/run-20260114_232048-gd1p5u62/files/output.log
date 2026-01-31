@@ -1,0 +1,138 @@
+Initializing detailed logger...
+[LOGGER] Saving logs to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs
+[LOGGER] CSV: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs\mappo_rrt_viz_grid3_cubes4_20260114_232037_20260114_232053_episode_log.csv
+Starting training...
+Total timesteps: 50
+Buffer size: 256
+Batch size: 64
+================================================================================
+[RESHUFFLE] Updated cube 2 position to [ 0.45    -0.1      0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.14123507 -0.35180542  0.05      ] (dist=0.696m)
+            New: [ 0.45    -0.1      0.02575] (dist=0.801m)
+            Improvement: -0.105m (-15.1%)
+[RESHUFFLE] Updated cube 3 position to [ 0.3     -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 3: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.71274036 0.1609095  0.05      ] (dist=0.994m)
+            New: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            Improvement: +0.251m (+25.3%)
+Episode 0 | Steps 4 | Reward 7.79 | Length 4 | Reshuffles 2
+[RESHUFFLE] Updated cube 0 position to [ 0.45    -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.1473223  -0.38028938  0.05      ] (dist=0.713m)
+            New: [ 0.45    -0.25     0.02575] (dist=0.834m)
+            Improvement: -0.121m (-16.9%)
+[RESHUFFLE] Updated cube 2 position to [ 0.3     -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.17975134 0.16870266 0.05      ] (dist=0.640m)
+            New: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            Improvement: -0.103m (-16.2%)
+[RESHUFFLE] Updated cube 2 position to [ 0.45    -0.1      0.02575] (simulation only)
+[RESHUFFLE] Cube 2: CROWDED_AREA (priority=3)
+            Old: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            New: [ 0.45    -0.1      0.02575] (dist=0.801m)
+            Improvement: -0.058m (-7.8%)
+Episode 1 | Steps 8 | Reward 3.94 | Length 4 | Reshuffles 3
+[RESHUFFLE] Updated cube 2 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.4238135  -0.11134106  0.05      ] (dist=0.768m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: -0.029m (-3.8%)
+[RESHUFFLE] Updated cube 1 position to [ 0.45    -0.1      0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.4710023  -0.38303295  0.05      ] (dist=0.880m)
+            New: [ 0.45    -0.1      0.02575] (dist=0.801m)
+            Improvement: +0.079m (+9.0%)
+Episode 2 | Steps 12 | Reward 4.60 | Length 4 | Reshuffles 2
+[RESHUFFLE] Updated cube 1 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.19299681 -0.3905393   0.05      ] (dist=0.735m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: -0.061m (-8.3%)
+Episode 3 | Steps 16 | Reward 1.38 | Length 4 | Reshuffles 1
+[RESHUFFLE] Updated cube 3 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 3: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.7481884  -0.10178196  0.05      ] (dist=1.016m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: +0.219m (+21.6%)
+Episode 4 | Steps 20 | Reward 6.44 | Length 4 | Reshuffles 1
+[RESHUFFLE] Updated cube 0 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.17331205 -0.37822098  0.05      ] (dist=0.721m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: -0.075m (-10.5%)
+[RESHUFFLE] Updated cube 0 position to [0.3     0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 0: CROWDED_AREA (priority=3)
+            Old: [0.45    0.05    0.02575] (dist=0.797m)
+            New: [0.3     0.05    0.02575] (dist=0.702m)
+            Improvement: +0.095m (+11.9%)
+[RESHUFFLE] Updated cube 1 position to [ 0.3     -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.47977522 -0.35207483  0.05      ] (dist=0.873m)
+            New: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            Improvement: +0.130m (+14.9%)
+Episode 5 | Steps 24 | Reward 7.80 | Length 4 | Reshuffles 3
+[RESHUFFLE] Updated cube 1 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.72920454 -0.07563407  0.05      ] (dist=0.998m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: +0.201m (+20.2%)
+Episode 6 | Steps 28 | Reward 6.40 | Length 4 | Reshuffles 1
+[RESHUFFLE] Updated cube 0 position to [ 0.3     -0.1      0.02575] (simulation only)
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.16151881 -0.39475018  0.05      ] (dist=0.726m)
+            New: [ 0.3     -0.1      0.02575] (dist=0.707m)
+            Improvement: +0.019m (+2.6%)
+Episode 7 | Steps 32 | Reward 3.04 | Length 4 | Reshuffles 1
+[RESHUFFLE] Updated cube 1 position to [ 0.3     -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.1431009  -0.09811872  0.05      ] (dist=0.609m)
+            New: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            Improvement: -0.134m (-22.0%)
+[RESHUFFLE] Updated cube 3 position to [ 0.45    -0.1      0.02575] (simulation only)
+[RESHUFFLE] Cube 3: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.7581722 -0.0871243  0.05     ] (dist=1.023m)
+            New: [ 0.45    -0.1      0.02575] (dist=0.801m)
+            Improvement: +0.222m (+21.7%)
+Episode 8 | Steps 36 | Reward 7.68 | Length 4 | Reshuffles 2
+[RESHUFFLE] Updated cube 1 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.75877064 -0.11948019  0.05      ] (dist=1.027m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: +0.230m (+22.4%)
+Episode 9 | Steps 38 | Reward 6.46 | Length 2 | Reshuffles 1
+[RESHUFFLE] Updated cube 3 position to [0.3     0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 3: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.7013963  0.19886811 0.05      ] (dist=0.992m)
+            New: [0.3     0.05    0.02575] (dist=0.702m)
+            Improvement: +0.290m (+29.3%)
+[RESHUFFLE] Updated cube 2 position to [ 0.3     -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.73934335 -0.3868762   0.05      ] (dist=1.075m)
+            New: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            Improvement: +0.332m (+30.9%)
+Episode 10 | Steps 42 | Reward 13.25 | Length 4 | Reshuffles 2
+[RESHUFFLE] Updated cube 0 position to [ 0.3     -0.25     0.02575] (simulation only)
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.7059991  -0.12679088  0.05      ] (dist=0.984m)
+            New: [ 0.3     -0.25     0.02575] (dist=0.743m)
+            Improvement: +0.241m (+24.5%)
+Episode 11 | Steps 46 | Reward 6.48 | Length 4 | Reshuffles 1
+[RESHUFFLE] Updated cube 2 position to [0.45    0.05    0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.7355133  -0.10898691  0.05      ] (dist=1.006m)
+            New: [0.45    0.05    0.02575] (dist=0.797m)
+            Improvement: +0.209m (+20.8%)
+[RESHUFFLE] Updated cube 1 position to [ 0.45    -0.1      0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.46876797 -0.3531651   0.05      ] (dist=0.866m)
+            New: [ 0.45    -0.1      0.02575] (dist=0.801m)
+            Improvement: +0.065m (+7.5%)
+Episode 12 | Steps 50 | Reward 9.55 | Length 4 | Reshuffles 2
+Saved final model to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\models\mappo_rrt_viz_grid3_cubes4_20260114_232037_final.pt
+
+[LOGGER] Training summary saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs\mappo_rrt_viz_grid3_cubes4_20260114_232037_summary.json
+[LOGGER] Total episodes: 13
+[LOGGER] Average reward: 6.52
+[LOGGER] Average reshuffles: 1.69
+[LOGGER] Logs saved successfully!

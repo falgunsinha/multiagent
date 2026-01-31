@@ -1,0 +1,10 @@
+Model,Reward_Mean,Pick_Success_Mean,Pick_Success_Std,Distance_Traveled_Mean,Distance_Traveled_Std,Time_Taken_Mean,Time_Taken_Std
+DDQN + mGAT,266.23,100.00,0.00,4.22,0.03,6.94,0.07
+Heuristic,,93.33,6.29,3.69,0.46,25.44,16.74
+Duel-DDQN + SAC,-409.15,55.81,12.93,2.18,1.33,22.06,9.69
+PER-DDQN-Full + SAC,-64.26,69.77,5.43,4.83,1.21,46.64,16.75
+PER-DDQN-Light + SAC,4.97,74.82,9.79,5.10,0.95,49.56,3.72
+C51-DDQN + SAC,-402.16,64.98,8.09,2.15,1.21,13.73,7.07
+PPO-Discrete + SAC,-363.03,60.05,7.40,2.63,1.49,22.40,13.30
+SAC-Discrete + SAC,-317.67,52.99,3.63,4.06,0.19,44.92,15.74
+

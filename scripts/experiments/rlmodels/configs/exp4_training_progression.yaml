@@ -1,0 +1,62 @@
+# Experiment 4: Training Progression Analysis
+experiment:
+  name: "Training Progression Analysis"
+  id: "exp4"
+  description: "Does more training on LunarLander help transfer?"
+  
+# Test PER-DDQN at different training checkpoints
+model_checkpoints:
+  - name: "PER-DDQN-50ep"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_50.pth"
+    episodes_trained: 50
+    
+  - name: "PER-DDQN-100ep"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_100.pth"
+    episodes_trained: 100
+    
+  - name: "PER-DDQN-150ep"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_150.pth"
+    episodes_trained: 150
+    
+  - name: "PER-DDQN-200ep"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_200.pth"
+    episodes_trained: 200
+    
+  - name: "PER-DDQN-250ep"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/model/PriorDQN_LLdV2_250.pth"
+    episodes_trained: 250
+
+testing:
+  episodes_per_checkpoint: 100
+  max_steps_per_episode: 50
+  num_cubes: 9
+  grid_size: 4
+  headless: true
+  
+state_adapter:
+  type: "feature_aggregation"
+  input_dim: 24
+  output_dim: 8
+  
+action_adapter:
+  type: "discrete_mapper"
+  
+metrics:
+  - success_rate
+  - avg_reward
+  - avg_steps
+  - collision_rate
+  - invalid_actions
+  - inference_time
+  
+wandb:
+  project: "exp-rl-models"
+  entity: "falgunsinha"
+  tags: ["training_progression", "checkpoints", "pretrained"]
+  
+output:
+  results_dir: "results/exp4_training_progression"
+  save_csv: true
+  save_json: true
+  save_plots: true
+

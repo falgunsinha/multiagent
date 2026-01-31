@@ -1,0 +1,39 @@
+ if end_effector_orientation is None:
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi / 2.0, 0]))
+        return super().forward(
+            picking_position,
+            placing_position,
+            current_joint_positions,
+            end_effector_offset=end_effector_offset,
+            end_effector_orientation=end_effector_orientation,
+        )
+
+
+translate
+(0.2897, 0.21265, 0.16335)
+Orient
+(0.0, 0.0, 180.0)
+scale
+(0.25, 0.05, 0.25)
+
+translate
+(0.33695, 0.21841, 0.11984)
+Orient
+(0.0, 0.0, 180.0)
+scale
+(0.25, 0.02, 0.25)
+
+
+Obstacle_1:
+Translate (0.59546, 0.27166, 0.15657)
+Orient (0.0, 0.0, 0.0)
+Scale (0.2, 0.05, 0.3)
+Obstacle_2:
+Translate (0.55678, -0.48569, 0.23348)
+Orient (0.0, 0.0, 90.0)
+Scale (0.2, 0.05, 0.3)
+
+
+
+
+

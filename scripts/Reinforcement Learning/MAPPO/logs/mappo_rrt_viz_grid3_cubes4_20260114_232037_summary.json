@@ -1,0 +1,33 @@
+{
+  "run_name": "mappo_rrt_viz_grid3_cubes4_20260114_232037",
+  "total_episodes": 13,
+  "avg_reward": 6.522679050186877,
+  "avg_episode_length": 3.8461538461538463,
+  "avg_reshuffles": 1.6923076923076923,
+  "best_episode": {
+    "episode": 10,
+    "total_reward": 13.245677280139208,
+    "episode_length": 4,
+    "reshuffles_performed": 2,
+    "total_distance_reduced": 0.6228386400696039,
+    "total_time_saved": 1.2456772801392078,
+    "timestamp": "2026-01-14T23:21:11.645650",
+    "cube_0_final_dist": 0.7732937335968018,
+    "cube_1_final_dist": 0.8455772399902344,
+    "cube_2_final_dist": 0.7431440949440002,
+    "cube_3_final_dist": 0.7016146779060364
+  },
+  "worst_episode": {
+    "episode": 3,
+    "total_reward": 1.3774342490515645,
+    "episode_length": 4,
+    "reshuffles_performed": 1,
+    "total_distance_reduced": -0.061282875474217735,
+    "total_time_saved": -0.12256575094843547,
+    "timestamp": "2026-01-14T23:21:02.329552",
+    "cube_0_final_dist": 1.0649625062942505,
+    "cube_1_final_dist": 0.7967202067375183,
+    "cube_2_final_dist": 0.8025023937225342,
+    "cube_3_final_dist": 0.6136043071746826
+  }
+}

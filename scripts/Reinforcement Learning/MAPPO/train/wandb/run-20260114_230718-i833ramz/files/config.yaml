@@ -1,0 +1,131 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            003gp9sjynf0a3octjbx82wzck1m2ub7:
+                args:
+                    - --grid_size
+                    - "3"
+                    - --num_cubes
+                    - "4"
+                    - --timesteps
+                    - "50"
+                    - --ddqn_model_path
+                    - C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_isaacsim_grid3_cubes4_20251223_203144_final.pt
+                    - --run_name
+                    - grid3x3_4cubes_isaacsim_test
+                    - --config_name
+                    - grid3x3_4cubes
+                    - --log_interval
+                    - "1"
+                    - --save_interval
+                    - "50"
+                    - --use_wandb
+                codePath: train_isaacsim_mappo.py
+                codePathLocal: train_isaacsim_mappo.py
+                cpu_count: 20
+                cpu_count_logical: 28
+                cudaVersion: "12.8"
+                disk:
+                    /:
+                        total: "1022880641024"
+                        used: "748633276416"
+                executable: C:\isaacsim\kit\python\kit.exe
+                gpu: NVIDIA RTX 3500 Ada Generation Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 5120
+                      memoryTotal: "12878610432"
+                      name: NVIDIA RTX 3500 Ada Generation Laptop GPU
+                      uuid: GPU-f3c2eeb3-17e9-4df8-c80a-1c7aa17f7ea8
+                host: CRD-SIMULATION5
+                memory:
+                    total: "33999233024"
+                os: Windows-10-10.0.26200-SP0
+                program: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train\train_isaacsim_mappo.py
+                python: CPython 3.11.13
+                root: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train
+                startedAt: "2026-01-14T22:07:18.976818Z"
+                writerId: 003gp9sjynf0a3octjbx82wzck1m2ub7
+        m:
+            - "1": global_step
+              "6":
+                - 3
+              "7": []
+            - "2": training/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": train/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": episode/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": reshuffle/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": mappo/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.11.13
+        t:
+            "1":
+                - 1
+                - 105
+            "2":
+                - 1
+                - 105
+            "3":
+                - 2
+                - 7
+                - 13
+                - 15
+                - 16
+            "4": 3.11.13
+            "5": 0.23.0
+            "8":
+                - 2
+                - 3
+            "12": 0.23.0
+            "13": windows-amd64
+batch_size:
+    value: 64
+buffer_size:
+    value: 256
+clip_param:
+    value: 0.2
+entropy_coef:
+    value: 0.01
+environment:
+    value: rrt_isaacsim
+gae_lambda:
+    value: 0.95
+gamma:
+    value: 0.99
+grid_size:
+    value: 3
+lr:
+    value: 0.0003
+max_grad_norm:
+    value: 0.5
+num_cubes:
+    value: 4
+num_mini_batch:
+    value: 4
+ppo_epochs:
+    value: 10
+timesteps:
+    value: 50
+value_loss_coef:
+    value: 1

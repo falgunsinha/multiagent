@@ -1,0 +1,72 @@
+{
+  "algorithm": "MASAC",
+  "scenario": "grid4_cubes9_astar",
+  "planner": "A*",
+  "env_type": "astar",
+  "grid_size": 4,
+  "num_cubes": 9,
+  "seed": 123,
+  "run_id": 2,
+  "num_episodes": 500,
+  "total_timesteps": 4433,
+  "timestamp": "20260118_043122",
+  "reward": {
+    "mean": 110.62093949771055,
+    "std": 43.398418135168534,
+    "variance": 1883.422696634925,
+    "median": 120.89429831891348,
+    "min": 0.0,
+    "max": 220.19385103683516
+  },
+  "success_rate": {
+    "mean": 0.985111111111111,
+    "percentage": 98.5111111111111,
+    "std": 3.785025726872464
+  },
+  "reshuffles": {
+    "mean": 5.0,
+    "std": 0.0,
+    "variance": 0.0,
+    "median": 5.0,
+    "min": 5,
+    "max": 5
+  },
+  "distance_reduced_m": {
+    "mean": 0.823469748855274,
+    "std": 0.4866392744617183,
+    "variance": 0.23681778344862756,
+    "median": 0.8926416027362483,
+    "min": -0.5236257975145071,
+    "max": 2.048743758757847
+  },
+  "time_saved_s": {
+    "mean": 1.646939497710548,
+    "std": 0.9732785489234366,
+    "variance": 0.9472711337945102,
+    "median": 1.7852832054724965,
+    "min": -1.0472515950290142,
+    "max": 4.097487517515694
+  },
+  "episode_length": {
+    "mean": 8.866,
+    "std": 0.3406523154185217,
+    "variance": 0.11604400000000001,
+    "median": 9.0,
+    "min": 8,
+    "max": 9
+  },
+  "cubes_picked": {
+    "mean": 8.866,
+    "std": 0.3406523154185217,
+    "variance": 0.11604400000000001,
+    "median": 9.0,
+    "min": 8,
+    "max": 9
+  },
+  "units": {
+    "distance": "meters",
+    "time": "seconds",
+    "reward": "dimensionless",
+    "success_rate": "percentage"
+  }
+}

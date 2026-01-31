@@ -1,0 +1,33 @@
+{
+  "run_name": "mappo_astar_grid3_cubes4_20260114_235928",
+  "total_episodes": 13,
+  "avg_reward": 7.7812950154038,
+  "avg_episode_length": 4.0,
+  "avg_reshuffles": 1.8461538461538463,
+  "best_episode": {
+    "episode": 12,
+    "total_reward": 10.17112561065808,
+    "episode_length": 4,
+    "reshuffles_performed": 2,
+    "total_distance_reduced": 0.5855628053290409,
+    "total_time_saved": 1.1711256106580819,
+    "timestamp": "2026-01-14T23:59:59.242888",
+    "cube_0_final_dist": 0.7867453694343567,
+    "cube_1_final_dist": 0.6595931649208069,
+    "cube_2_final_dist": 0.6423885822296143,
+    "cube_3_final_dist": 0.7339797019958496
+  },
+  "worst_episode": {
+    "episode": 4,
+    "total_reward": 1.4116216502168666,
+    "episode_length": 4,
+    "reshuffles_performed": 1,
+    "total_distance_reduced": -0.04418917489156671,
+    "total_time_saved": -0.08837834978313341,
+    "timestamp": "2026-01-14T23:59:58.292201",
+    "cube_0_final_dist": 1.006784439086914,
+    "cube_1_final_dist": 0.6595931649208069,
+    "cube_2_final_dist": 0.7696027755737305,
+    "cube_3_final_dist": 0.7347913980484009
+  }
+}

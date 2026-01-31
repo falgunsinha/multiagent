@@ -1,0 +1,88 @@
+# Central registry of all pretrained model paths
+# All models are copied to local models/pretrained/ directory
+base_dir: "cobotproject/scripts/experiments/rlmodels/models/pretrained"
+
+discrete_models:
+  duel_ddqn_lunarlander:
+    path: "duel_ddqn_lunarlander.pth"
+    type: "dqn"
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+
+  c51_ddqn_lunarlander:
+    path: "c51_ddqn_lunarlander.pth"
+    type: "dqn"
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+
+  sac_discrete_lunarlander:
+    path: "sac_discrete_lunarlander.pth"
+    type: "sac"
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+
+  ppo_discrete_lunarlander:
+    path: "ppo_discrete_lunarlander_actor.pth"
+    critic_path: "ppo_discrete_lunarlander_critic.pth"
+    type: "ppo"
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+
+continuous_models:
+  td3_pendulum:
+    path: "td3_pendulum_actor.pth"
+    critic_path: "td3_pendulum_critic.pth"
+    type: "td3"
+    source_env: "Pendulum-v1"
+    state_dim: 3
+    action_dim: 1
+
+  td3_bipedalwalker:
+    path: "td3_bipedalwalker_actor.pth"
+    critic_path: "td3_bipedalwalker_critic.pth"
+    type: "td3"
+    source_env: "BipedalWalker-v3"
+    state_dim: 24
+    action_dim: 4
+
+  sac_continuous_bipedalwalker:
+    path: "sac_continuous_bipedalwalker_actor.pth"
+    critic_path: "sac_continuous_bipedalwalker_critic.pth"
+    type: "sac"
+    source_env: "BipedalWalker-v3"
+    state_dim: 24
+    action_dim: 4
+
+  ppo_continuous_pendulum:
+    path: "ppo_continuous_pendulum_actor.pth"
+    critic_path: "ppo_continuous_pendulum_critic.pth"
+    type: "ppo"
+    source_env: "Pendulum-v1"
+    state_dim: 3
+    action_dim: 1
+
+custom_models:
+  ddqn_isaac_grid3_cubes4:
+    path: "custom_ddqn_isaacsim.pt"
+    type: "ddqn"
+    source_env: "Isaac-Sim-RRT-3x3-4cubes"
+    grid_size: 3
+    num_cubes: 4
+    episodes_trained: 12500
+    success_rate: 1.0
+    avg_reward: 99.77
+    description: "Custom DDQN trained on Isaac Sim with RRT (3x3 grid, 4 cubes)"
+    
+# Checkpoint paths for training progression analysis
+checkpoints:
+  per_ddqn:
+    - "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_50.pth"
+    - "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_100.pth"
+    - "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_150.pth"
+    - "2.3 Prioritized-Experience-Replay-DDQN-DQN/checkpoints/PriorDQN_LLdV2_200.pth"
+    - "2.3 Prioritized-Experience-Replay-DDQN-DQN/model/PriorDQN_LLdV2_250.pth"
+

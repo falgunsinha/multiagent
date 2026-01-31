@@ -1,0 +1,44 @@
+{
+  "os":  "Windows-10-10.0.26200-SP0",
+  "python":  "CPython 3.11.9",
+  "startedAt":  "2025-12-20T00:20:01.848528Z",
+  "args":  [
+    "--grid_size",
+    "3",
+    "--num_cubes",
+    "4",
+    "--timesteps",
+    "50000",
+    "--use_wandb"
+  ],
+  "program":  "C:\\isaacsim\\cobotproject\\scripts\\Reinforcement Learning\\doubleDQN_script\\train_astar_ddqn.py",
+  "codePath":  "train_astar_ddqn.py",
+  "codePathLocal":  "train_astar_ddqn.py",
+  "root":  "C:\\isaacsim\\cobotproject\\scripts\\Reinforcement Learning\\doubleDQN_script",
+  "host":  "CRD-SIMULATION5",
+  "executable":  "C:\\Users\\Simulation\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+  "cpu_count":  20,
+  "cpu_count_logical":  28,
+  "gpu":  "NVIDIA RTX 3500 Ada Generation Laptop GPU",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "1022880641024",
+      "used":  "716062195712"
+    }
+  },
+  "memory":  {
+    "total":  "33999233024"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA RTX 3500 Ada Generation Laptop GPU",
+      "memoryTotal":  "12878610432",
+      "cudaCores":  5120,
+      "architecture":  "Ada",
+      "uuid":  "GPU-f3c2eeb3-17e9-4df8-c80a-1c7aa17f7ea8"
+    }
+  ],
+  "cudaVersion":  "12.8",
+  "writerId":  "vn400zhxm2lkwxm541c8dmbeh4wnw8ds"
+}

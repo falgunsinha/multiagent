@@ -1,0 +1,1 @@
+episode,model,seed,agent1_reward,success,cubes_picked,pick_failures,successful_picks,unreachable_cubes,path_efficiency,action_entropy,agent2_reward,reshuffles_performed,total_distance_reduced,total_time_saved,total_reward,episode_length,duration,timestamp,planner,grid_size,num_cubes

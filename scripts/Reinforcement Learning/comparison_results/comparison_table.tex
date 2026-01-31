@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\caption{Training Comparison: GAT-CVD vs MASAC (12,933 Timesteps)}
+\label{tab:gatcvd_vs_masac}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{GAT-CVD} & \textbf{MASAC} \\
+\midrule
+Final Mean Reward & -77.89 & -134.92 \\
+Final Success Rate (%) & 87.00 & 85.00 \\
+Final Episode Length & 18.00 & 9.00 \\
+Episodes to 80% Success & 2 & 15 \\
+Episodes to 90% Success & 3 & nan \\
+Timesteps to 80% Success & 9 & 414 \\
+Timesteps to 90% Success & 18 & nan \\
+\midrule
+\multicolumn{3}{l}{\textit{Statistical Comparison (Last 100 Episodes)}} \\
+Reward & $-81.12 \pm 535.06$ & $-134.92 \pm 581.42$ \\
+Success Rate & $86.44 \pm 23.67$ & $85.00 \pm 22.41$ \\
+\bottomrule
+\end{tabular}
+\end{table}

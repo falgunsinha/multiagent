@@ -1,0 +1,26 @@
+2026-01-14 23:59:40,832 INFO    MainThread:40772 [wandb_setup.py:_flush():80] Current SDK version is 0.23.0
+2026-01-14 23:59:40,832 INFO    MainThread:40772 [wandb_setup.py:_flush():80] Configure stats pid to 40772
+2026-01-14 23:59:40,832 INFO    MainThread:40772 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Simulation\.config\wandb\settings
+2026-01-14 23:59:40,832 INFO    MainThread:40772 [wandb_setup.py:_flush():80] Loading settings from C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train\wandb\settings
+2026-01-14 23:59:40,832 INFO    MainThread:40772 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2026-01-14 23:59:40,833 INFO    MainThread:40772 [wandb_init.py:setup_run_log_directory():713] Logging user logs to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train\wandb\run-20260114_235940-i68r4h4z\logs\debug.log
+2026-01-14 23:59:40,837 INFO    MainThread:40772 [wandb_init.py:setup_run_log_directory():714] Logging internal logs to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train\wandb\run-20260114_235940-i68r4h4z\logs\debug-internal.log
+2026-01-14 23:59:40,837 INFO    MainThread:40772 [wandb_init.py:init():840] calling init triggers
+2026-01-14 23:59:40,838 INFO    MainThread:40772 [wandb_init.py:init():845] wandb.init called with sweep_config: {}
+config: {'grid_size': 3, 'num_cubes': 4, 'max_steps': 50, 'timesteps': 50, 'buffer_size': 256, 'batch_size': 64, 'ppo_epochs': 10, 'num_mini_batch': 4, 'lr': 0.0003, 'gamma': 0.99, 'gae_lambda': 0.95, 'clip_param': 0.2, 'value_loss_coef': 1.0, 'entropy_coef': 0.01, 'max_grad_norm': 0.5, 'max_reshuffles': 5, 'reshuffle_reward_scale': 1.0, 'ddqn_model_path': 'C:\\isaacsim\\cobotproject\\scripts\\Reinforcement Learning\\doubleDQN_script\\models\\ddqn_astar_grid3_cubes4_20251220_012015_final.pt', 'wandb_project': 'ddqn-mappo-object-selection-reshuffling', 'run_name': 'grid3x3_4cubes_astar_test', 'config_name': 'grid3x3_4cubes', 'log_interval': 1, 'save_interval': 50, 'seed': 42, 'device': 'cuda', 'resume': None, '_wandb': {}}
+2026-01-14 23:59:40,838 INFO    MainThread:40772 [wandb_init.py:init():888] starting backend
+2026-01-14 23:59:44,585 INFO    MainThread:40772 [wandb_init.py:init():891] sending inform_init request
+2026-01-14 23:59:44,654 INFO    MainThread:40772 [wandb_init.py:init():899] backend started and connected
+2026-01-14 23:59:44,946 INFO    MainThread:40772 [wandb_init.py:init():969] updated telemetry
+2026-01-14 23:59:44,949 INFO    MainThread:40772 [wandb_init.py:init():993] communicating run to backend with 90.0 second timeout
+2026-01-14 23:59:46,275 INFO    MainThread:40772 [wandb_init.py:init():1040] starting run threads in backend
+2026-01-14 23:59:56,916 INFO    MainThread:40772 [wandb_run.py:_console_start():2504] atexit reg
+2026-01-14 23:59:56,916 INFO    MainThread:40772 [wandb_run.py:_redirect():2352] redirect: wrap_raw
+2026-01-14 23:59:56,916 INFO    MainThread:40772 [wandb_run.py:_redirect():2421] Wrapping output streams.
+2026-01-14 23:59:56,917 INFO    MainThread:40772 [wandb_run.py:_redirect():2444] Redirects installed.
+2026-01-14 23:59:56,989 INFO    MainThread:40772 [wandb_init.py:init():1080] run started, returning control to user process
+2026-01-14 23:59:59,265 INFO    MainThread:40772 [wandb_run.py:_finish():2270] finishing run falgunsinha/ddqn-mappo-object-selection-reshuffling/i68r4h4z
+2026-01-14 23:59:59,266 INFO    MainThread:40772 [wandb_run.py:_atexit_cleanup():2469] got exitcode: 0
+2026-01-14 23:59:59,267 INFO    MainThread:40772 [wandb_run.py:_restore():2451] restore
+2026-01-14 23:59:59,267 INFO    MainThread:40772 [wandb_run.py:_restore():2457] restore done
+2026-01-15 00:00:00,339 INFO    MainThread:40772 [wandb_run.py:_footer_sync_info():3853] logging synced files

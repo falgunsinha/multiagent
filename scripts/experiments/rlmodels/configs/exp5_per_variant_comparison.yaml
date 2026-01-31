@@ -1,0 +1,57 @@
+# Experiment 5: PER Variant Comparison
+experiment:
+  name: "PER Variant Comparison"
+  id: "exp5"
+  description: "Does PER implementation matter for transfer?"
+  
+models:
+  - name: "LightPriorDQN"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/model/LightPriorDQN_LLdV2_250.pth"
+    type: "discrete"
+    variant: "lightweight_per"
+    episodes_trained: 250
+    state_dim: 8
+    action_dim: 4
+    
+  - name: "PriorDQN"
+    path: "2.3 Prioritized-Experience-Replay-DDQN-DQN/model/PriorDQN_LLdV2_250.pth"
+    type: "discrete"
+    variant: "full_per"
+    episodes_trained: 250
+    state_dim: 8
+    action_dim: 4
+
+testing:
+  episodes_per_variant: 100
+  max_steps_per_episode: 50
+  num_cubes: 9
+  grid_size: 4
+  headless: true
+  
+state_adapter:
+  type: "feature_aggregation"
+  input_dim: 24
+  output_dim: 8
+  
+action_adapter:
+  type: "discrete_mapper"
+  
+metrics:
+  - success_rate
+  - avg_reward
+  - avg_steps
+  - collision_rate
+  - invalid_actions
+  - inference_time
+  
+wandb:
+  project: "exp-rl-models"
+  entity: "falgunsinha"
+  tags: ["per_variant", "comparison", "pretrained"]
+  
+output:
+  results_dir: "results/exp5_per_variant_comparison"
+  save_csv: true
+  save_json: true
+  save_plots: true
+

@@ -1,0 +1,181 @@
+# Isaac Grasp file for Franka Panda gripper and cylindrical objects
+# This file defines optimal grasps for cylinders to prevent slipping during pick and place
+
+format: isaac_grasp
+format_version: 1.0
+
+# Frame references:
+# - object_frame_link: Center of the cylinder (DynamicCylinder center)
+# - gripper_frame_link: Franka panda_rightfinger (end-effector frame used in script)
+object_frame_link: /World/Cylinder_1
+gripper_frame_link: /World/Franka/panda_rightfinger
+
+grasps:
+  # Grasp 0: Optimal center grasp with secure finger closure
+  # This grasp positions the gripper to grasp the cylinder at its center
+  # with fingers applying force symmetrically around the circumference
+  grasp_0:
+    confidence: 1.0
+    # Position: gripper frame relative to cylinder center
+    # [x, y, z] in meters - gripper approaches from above, centered on cylinder
+    position: [0.0, 0.0, 0.0]
+    # Orientation: gripper frame relative to cylinder frame
+    # Quaternion {w, xyz} - gripper oriented downward (-90° pitch)
+    # This ensures fingers close horizontally around the cylinder
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Joint positions when grasping (fingers closed on cylinder)
+    # Franka gripper has two finger joints: panda_finger_joint1 and panda_finger_joint2
+    # For cylinder with radius ~0.0387m (scaled 1.5x from 0.0258m base):
+    # Cylinder diameter = 2 * 0.0387 = 0.0774m (7.74cm)
+    # Each finger closes to ~0.035m (3.5cm) for secure grip without crushing
+    # This provides good contact force while preventing slipping
+    cspace_position:
+      panda_finger_joint1: 0.035
+      panda_finger_joint2: 0.035
+    # Joint positions before grasping (fingers open)
+    # Open to 5cm per finger (10cm total) for clearance when approaching
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 1: Tighter grasp with maximum finger force
+  # This grasp applies more closing force to prevent slipping during placement
+  # Use this when cylinders are slipping or for more secure hold
+  grasp_1:
+    confidence: 0.95
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Tighter closure: 3.2cm per finger for maximum grip force
+    cspace_position:
+      panda_finger_joint1: 0.032
+      panda_finger_joint2: 0.032
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 2: Moderate grasp (fallback option)
+  # Slightly looser than grasp_0 for objects that might deform
+  grasp_2:
+    confidence: 0.90
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Moderate closure: 3.8cm per finger
+    cspace_position:
+      panda_finger_joint1: 0.038
+      panda_finger_joint2: 0.038
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 3: Maximum force grasp (anti-slip)
+  # This grasp applies maximum closing force to prevent slipping during transport
+  # Use this when cylinders are slipping during pick retreat or placement approach
+  grasp_3:
+    confidence: 1.0
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Maximum closure: 2.5cm per finger for strongest grip force
+    # This is tighter than grasp_1 to prevent any slipping
+    cspace_position:
+      panda_finger_joint1: 0.025
+      panda_finger_joint2: 0.025
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 4: Ultra-tight grasp (maximum anti-slip)
+  # This grasp applies even more closing force for cylinders that keep slipping
+  # Use this as last resort when grasp_3 still allows slipping
+  grasp_4:
+    confidence: 1.0
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Ultra-tight closure: 2.0cm per finger for maximum grip force
+    # This is the tightest safe closure without crushing the cylinder
+    cspace_position:
+      panda_finger_joint1: 0.020
+      panda_finger_joint2: 0.020
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 5: Extreme-tight grasp (absolute maximum anti-slip)
+  # This grasp applies extreme closing force for cylinders that still slip with grasp_4
+  # Use this only if all other grasps fail - may deform soft cylinders
+  grasp_5:
+    confidence: 1.0
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Extreme-tight closure: 1.6cm per finger for absolute maximum grip force
+    # This is near the physical limit - use with caution
+    cspace_position:
+      panda_finger_joint1: 0.016
+      panda_finger_joint2: 0.016
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 6: Maximum-force grasp (ultimate anti-slip)
+  # This grasp applies maximum possible closing force
+  # Use this as absolute last resort - highest grip force possible
+  grasp_6:
+    confidence: 1.0
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Maximum-force closure: 1.2cm per finger for ultimate grip force
+    # This is the absolute maximum safe closure
+    cspace_position:
+      panda_finger_joint1: 0.012
+      panda_finger_joint2: 0.012
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 7: Ultra-maximum-force grasp (absolute limit)
+  # This grasp applies the absolute maximum closing force
+  # Use this only if grasp_6 still allows slipping
+  grasp_7:
+    confidence: 1.0
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Ultra-maximum closure: 0.8cm per finger for absolute limit
+    # This is the physical limit - may deform cylinders
+    cspace_position:
+      panda_finger_joint1: 0.008
+      panda_finger_joint2: 0.008
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 8: Extreme-maximum-force grasp (beyond limit)
+  # This grasp applies extreme closing force - use as last resort
+  # May deform cylinders but prevents any slipping
+  grasp_8:
+    confidence: 1.0
+    position: [0.0, 0.0, 0.0]
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Extreme closure: 0.5cm per finger - absolute maximum
+    # This is beyond normal limits - use only if all else fails
+    cspace_position:
+      panda_finger_joint1: 0.005
+      panda_finger_joint2: 0.005
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+
+  # Grasp 9: Ultimate-force grasp with position offset
+  # Accounts for 4mm gripper offset, applies maximum force
+  # Tighter closure to prevent slipping
+  grasp_9:
+    confidence: 1.0
+    position: [0.004, 0.004, 0.0]  # 4mm offset to match gripper alignment
+    orientation: {w: 0.7071, xyz: [0.7071, 0.0, 0.0]}
+    # Extreme closure: 0.3cm per finger - maximum compression
+    # Tighter than previous to prevent any slipping
+    cspace_position:
+      panda_finger_joint1: 0.003
+      panda_finger_joint2: 0.003
+    pregrasp_cspace_position:
+      panda_finger_joint1: 0.05
+      panda_finger_joint2: 0.05
+

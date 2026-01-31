@@ -1,0 +1,33 @@
+{
+  "run_name": "mappo_rrt_isaacsim_grid3_cubes4_20260114_230707",
+  "total_episodes": 13,
+  "avg_reward": 4.850110863110257,
+  "avg_episode_length": 3.8461538461538463,
+  "avg_reshuffles": 2.5384615384615383,
+  "best_episode": {
+    "episode": 8,
+    "total_reward": 7.181624657800759,
+    "episode_length": 4,
+    "reshuffles_performed": 3,
+    "total_distance_reduced": -0.15918767109962034,
+    "total_time_saved": -0.3183753421992407,
+    "timestamp": "2026-01-14T23:08:34.163120",
+    "cube_0_final_dist": 0.6402983665466309,
+    "cube_1_final_dist": 0.6026301383972168,
+    "cube_2_final_dist": 0.4491618871688843,
+    "cube_3_final_dist": 0.4616958498954773
+  },
+  "worst_episode": {
+    "episode": 1,
+    "total_reward": 1.9558726416112067,
+    "episode_length": 4,
+    "reshuffles_performed": 1,
+    "total_distance_reduced": 0.22793632080560328,
+    "total_time_saved": 0.45587264161120655,
+    "timestamp": "2026-01-14T23:08:21.935605",
+    "cube_0_final_dist": 0.4554689824581146,
+    "cube_1_final_dist": 0.3913605213165283,
+    "cube_2_final_dist": 0.4506376385688782,
+    "cube_3_final_dist": 0.300526887178421
+  }
+}

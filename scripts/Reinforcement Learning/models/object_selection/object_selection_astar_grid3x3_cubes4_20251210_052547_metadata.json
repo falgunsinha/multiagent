@@ -1,0 +1,11 @@
+{
+  "method": "astar",
+  "training_grid_size": 3,
+  "num_cubes": 4,
+  "max_objects": 9,
+  "max_steps": 50,
+  "timestamp": "20251210_052547",
+  "total_timesteps": 50000,
+  "learning_rate": 0.0003,
+  "policy": "mlp"
+}

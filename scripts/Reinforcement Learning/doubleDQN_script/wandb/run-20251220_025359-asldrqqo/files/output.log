@@ -1,0 +1,96 @@
+W&B logging enabled
+============================================================
+DOUBLE DQN TRAINING - RRT VIZ (PythonRobotics)
+============================================================
+Method: RRT Viz (PythonRobotics RRT)
+Timesteps: 50000
+Grid: 3x3
+Cubes: 4
+Learning rate: 0.001
+Batch size: 64
+Gamma: 0.99
+Epsilon: 1.0 -> 0.01 (decay: 0.995)
+============================================================
+[Double DQN] Initialized agent on cuda
+[Double DQN] State dim: 54, Action dim: 9
+[Double DQN] Epsilon decay: exponential
+[Double DQN] Target update: soft (tau=0.005)
+[Double DQN] Warmup steps: 1000
+
+Starting training...
+Checkpoints will be saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models/ddqn_rrt_viz_grid3_cubes4_20251220_025425
+Training log will be saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\logs\ddqn_rrt_viz_grid3_cubes4_20251220_025425_training.csv
+Episode log will be saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\logs\ddqn_rrt_viz_grid3_cubes4_20251220_025425_episodes.csv
+============================================================
+
+Steps: 1000/50000 | Episode: 249 | Avg Reward (100 ep): 128.26 | Epsilon: 0.6736 | Loss: 31.7873
+Steps: 2000/50000 | Episode: 499 | Avg Reward (100 ep): 124.20 | Epsilon: 0.4548 | Loss: 3.2218
+Steps: 3000/50000 | Episode: 749 | Avg Reward (100 ep): 127.64 | Epsilon: 0.3082 | Loss: 3.0904
+Steps: 4000/50000 | Episode: 999 | Avg Reward (100 ep): 128.34 | Epsilon: 0.2099 | Loss: 1.6984
+Steps: 5000/50000 | Episode: 1249 | Avg Reward (100 ep): 127.48 | Epsilon: 0.1440 | Loss: 2.7709
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_5000.pt
+Steps: 6000/50000 | Episode: 1499 | Avg Reward (100 ep): 124.66 | Epsilon: 0.0998 | Loss: 2.2993
+Steps: 7000/50000 | Episode: 1749 | Avg Reward (100 ep): 126.32 | Epsilon: 0.0702 | Loss: 4.0303
+Steps: 8000/50000 | Episode: 1999 | Avg Reward (100 ep): 125.50 | Epsilon: 0.0504 | Loss: 3.0648
+Steps: 9000/50000 | Episode: 2249 | Avg Reward (100 ep): 126.91 | Epsilon: 0.0371 | Loss: 2.1748
+Steps: 10000/50000 | Episode: 2499 | Avg Reward (100 ep): 127.05 | Epsilon: 0.0281 | Loss: 2.8110
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_10000.pt
+Steps: 11000/50000 | Episode: 2749 | Avg Reward (100 ep): 125.93 | Epsilon: 0.0222 | Loss: 2.0052
+Steps: 12000/50000 | Episode: 2999 | Avg Reward (100 ep): 126.59 | Epsilon: 0.0181 | Loss: 1.7733
+Steps: 13000/50000 | Episode: 3249 | Avg Reward (100 ep): 126.57 | Epsilon: 0.0155 | Loss: 2.6849
+Steps: 14000/50000 | Episode: 3499 | Avg Reward (100 ep): 123.88 | Epsilon: 0.0137 | Loss: 3.0767
+Steps: 15000/50000 | Episode: 3749 | Avg Reward (100 ep): 125.39 | Epsilon: 0.0125 | Loss: 2.2948
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_15000.pt
+Steps: 16000/50000 | Episode: 3999 | Avg Reward (100 ep): 124.30 | Epsilon: 0.0116 | Loss: 2.1974
+Steps: 17000/50000 | Episode: 4249 | Avg Reward (100 ep): 126.63 | Epsilon: 0.0111 | Loss: 1.5375
+Steps: 18000/50000 | Episode: 4499 | Avg Reward (100 ep): 126.17 | Epsilon: 0.0107 | Loss: 2.4779
+Steps: 19000/50000 | Episode: 4749 | Avg Reward (100 ep): 125.76 | Epsilon: 0.0105 | Loss: 2.2032
+Steps: 20000/50000 | Episode: 4999 | Avg Reward (100 ep): 126.00 | Epsilon: 0.0103 | Loss: 3.0136
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_20000.pt
+Steps: 21000/50000 | Episode: 5249 | Avg Reward (100 ep): 126.86 | Epsilon: 0.0102 | Loss: 1.7302
+Steps: 22000/50000 | Episode: 5499 | Avg Reward (100 ep): 128.50 | Epsilon: 0.0101 | Loss: 3.2437
+Steps: 23000/50000 | Episode: 5749 | Avg Reward (100 ep): 126.81 | Epsilon: 0.0101 | Loss: 1.8887
+Steps: 24000/50000 | Episode: 5999 | Avg Reward (100 ep): 128.20 | Epsilon: 0.0101 | Loss: 2.6175
+Steps: 25000/50000 | Episode: 6249 | Avg Reward (100 ep): 125.95 | Epsilon: 0.0100 | Loss: 2.5055
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_25000.pt
+Steps: 26000/50000 | Episode: 6499 | Avg Reward (100 ep): 127.27 | Epsilon: 0.0100 | Loss: 1.6245
+Steps: 27000/50000 | Episode: 6749 | Avg Reward (100 ep): 126.17 | Epsilon: 0.0100 | Loss: 2.4625
+Steps: 28000/50000 | Episode: 6999 | Avg Reward (100 ep): 129.00 | Epsilon: 0.0100 | Loss: 2.6076
+Steps: 29000/50000 | Episode: 7249 | Avg Reward (100 ep): 127.96 | Epsilon: 0.0100 | Loss: 1.9378
+Steps: 30000/50000 | Episode: 7499 | Avg Reward (100 ep): 125.80 | Epsilon: 0.0100 | Loss: 1.4677
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_30000.pt
+Steps: 31000/50000 | Episode: 7749 | Avg Reward (100 ep): 128.65 | Epsilon: 0.0100 | Loss: 2.0284
+Steps: 32000/50000 | Episode: 7999 | Avg Reward (100 ep): 126.17 | Epsilon: 0.0100 | Loss: 2.1454
+Steps: 33000/50000 | Episode: 8249 | Avg Reward (100 ep): 125.65 | Epsilon: 0.0100 | Loss: 1.7082
+Steps: 34000/50000 | Episode: 8499 | Avg Reward (100 ep): 126.01 | Epsilon: 0.0100 | Loss: 2.4611
+Steps: 35000/50000 | Episode: 8749 | Avg Reward (100 ep): 126.62 | Epsilon: 0.0100 | Loss: 2.4388
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_35000.pt
+Steps: 36000/50000 | Episode: 8999 | Avg Reward (100 ep): 126.34 | Epsilon: 0.0100 | Loss: 1.5831
+Steps: 37000/50000 | Episode: 9249 | Avg Reward (100 ep): 124.68 | Epsilon: 0.0100 | Loss: 2.2304
+Steps: 38000/50000 | Episode: 9499 | Avg Reward (100 ep): 129.19 | Epsilon: 0.0100 | Loss: 2.5236
+Steps: 39000/50000 | Episode: 9749 | Avg Reward (100 ep): 126.26 | Epsilon: 0.0100 | Loss: 2.0215
+Steps: 40000/50000 | Episode: 9999 | Avg Reward (100 ep): 126.04 | Epsilon: 0.0100 | Loss: 2.1744
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_40000.pt
+Steps: 41000/50000 | Episode: 10249 | Avg Reward (100 ep): 126.65 | Epsilon: 0.0100 | Loss: 1.9689
+Steps: 42000/50000 | Episode: 10499 | Avg Reward (100 ep): 125.98 | Epsilon: 0.0100 | Loss: 2.2237
+Steps: 43000/50000 | Episode: 10749 | Avg Reward (100 ep): 126.24 | Epsilon: 0.0100 | Loss: 3.0481
+Steps: 44000/50000 | Episode: 10999 | Avg Reward (100 ep): 127.82 | Epsilon: 0.0100 | Loss: 1.5999
+Steps: 45000/50000 | Episode: 11249 | Avg Reward (100 ep): 127.11 | Epsilon: 0.0100 | Loss: 1.5671
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_45000.pt
+Steps: 46000/50000 | Episode: 11499 | Avg Reward (100 ep): 127.39 | Epsilon: 0.0100 | Loss: 1.3215
+Steps: 47000/50000 | Episode: 11749 | Avg Reward (100 ep): 130.05 | Epsilon: 0.0100 | Loss: 2.1139
+Steps: 48000/50000 | Episode: 11999 | Avg Reward (100 ep): 126.30 | Epsilon: 0.0100 | Loss: 2.0670
+Steps: 49000/50000 | Episode: 12249 | Avg Reward (100 ep): 127.11 | Epsilon: 0.0100 | Loss: 2.4806
+Steps: 50000/50000 | Episode: 12499 | Avg Reward (100 ep): 125.72 | Epsilon: 0.0100 | Loss: 2.6126
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_step_50000.pt
+[Double DQN] Saved checkpoint to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_final.pt
+
+============================================================
+TRAINING COMPLETE
+============================================================
+Total episodes: 12500
+Final model saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_final.pt
+Metadata saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_viz_grid3_cubes4_20251220_025425_metadata.json
+Average reward (last 100 ep): 125.64
+Success rate (last 100 ep): 100.00%
+============================================================

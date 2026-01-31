@@ -1,0 +1,12 @@
+{
+  "method": "rrt",
+  "training_grid_size": 3,
+  "max_objects": 9,
+  "num_cubes": 4,
+  "max_steps": 50,
+  "timestamp": "20251210_093439",
+  "total_timesteps": 50000,
+  "learning_rate": 0.0003,
+  "execute_picks": false,
+  "policy": "mlp"
+}

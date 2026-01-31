@@ -1,0 +1,102 @@
+# Experiment 1: Discrete Model Comparison
+experiment:
+  name: "Discrete Model Comparison"
+  id: "exp1"
+  description: "Compare discrete action pretrained models against custom DDQN"
+
+models:
+  - name: "Duel-DDQN"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/duel_ddqn_lunarlander.pth"
+    type: "ddqn"  # Changed from "dqn" to "ddqn" - it's a Double DQN variant
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+    episodes: 99
+
+  - name: "PER-DDQN-Light"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/per_ddqn_light_lunarlander.pth"
+    type: "ddqn"  # Changed from "dqn" to "ddqn" - it's a Double DQN with PER
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+    episodes: 99
+
+  - name: "PER-DDQN-Full"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/per_ddqn_full_lunarlander.pth"
+    type: "ddqn"  # Changed from "dqn" to "ddqn" - it's a Double DQN with PER
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+    episodes: 99
+
+  - name: "C51-DDQN"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/c51_ddqn_lunarlander.pth"
+    type: "ddqn"  # Changed from "dqn" to "ddqn" - it's a Categorical Double DQN
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+    episodes: 99
+
+  - name: "SAC-Discrete"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/sac_discrete_lunarlander_actor.pth"
+    type: "pytorch"  # Changed from "sac" to "pytorch" - it's a PyTorch model, not SB3
+    source_env: "LunarLander-v2"
+    state_dim: 8
+    action_dim: 4
+    episodes: 99
+
+  - name: "PPO-Discrete"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/ppo_discrete_lunarlander_actor.pth"
+    type: "pytorch"  # Changed from "ppo" to "pytorch" - it's a PyTorch model, not SB3
+    source_env: "CartPole-v1"  # Actually trained on CartPole, not LunarLander
+    state_dim: 4  # CartPole has 4D state (position, velocity, angle, angular_velocity)
+    action_dim: 2  # CartPole has 2 actions (left, right)
+    episodes: 99
+
+  - name: "DDQN"
+    path: "C:/isaacsim/cobotproject/scripts/experiments/rlmodels/models/pretrained/custom_ddqn_grid4_cubes9.pt"
+    type: "ddqn"
+    source_env: "Isaac-Sim-RRT-4x4-9cubes"
+    custom: true
+    episodes_trained: 12500
+    success_rate: 1.0
+    avg_reward: 99.77
+    episodes: 99
+
+testing:
+  episodes_per_model: 99
+  grid_size: 4  # 4x4 grid (16 cells) - MATCHES custom_ddqn_grid4_cubes9.pt
+  num_cubes: 9  # 9 cubes (56% density) - MATCHES custom_ddqn_grid4_cubes9.pt
+  num_obstacles: 5  # 4-6 obstacles (randomized per episode) - MUCH MORE CHALLENGING!
+  max_steps_per_episode: 30  # Reduced from 50 to add time pressure
+  headless: true
+
+state_adapter:
+  type: "feature_aggregation"
+  input_dim: 96  # 4x4 grid = 16 objects × 6 features = 96D
+  output_dim: 8
+
+action_adapter:
+  type: "discrete_mapper"
+  source_actions: 4  # LunarLander has 4 actions
+  target_actions: 16  # 4x4 grid = 16 positions (action space)
+  
+metrics:
+  - success_rate
+  - avg_reward
+  - avg_steps
+  - collision_rate
+  - invalid_actions
+  - inference_time
+  
+wandb:
+  project: "exp-rl-models"
+  entity: "falgunsinha"
+  tags: ["discrete", "comparison", "pretrained"]
+  
+output:
+  results_dir: "results/exp1_discrete_comparison"
+  save_csv: true
+  save_json: true
+  save_plots: true
+

@@ -1,0 +1,72 @@
+{
+  "algorithm": "MASAC",
+  "scenario": "grid4_cubes9_rrt_viz",
+  "planner": "RRT Viz",
+  "env_type": "rrt_viz",
+  "grid_size": 4,
+  "num_cubes": 9,
+  "seed": 123,
+  "run_id": 2,
+  "num_episodes": 500,
+  "total_timesteps": 4429,
+  "timestamp": "20260121_025141",
+  "reward": {
+    "mean": 274.8119620110048,
+    "std": 43.94646670883354,
+    "variance": 1931.2919361906145,
+    "median": 278.7483178700709,
+    "min": 154.45627531428056,
+    "max": 401.7784014246998
+  },
+  "success_rate": {
+    "mean": 0.9842222222222223,
+    "percentage": 98.42222222222223,
+    "std": 4.06484476492805
+  },
+  "reshuffles": {
+    "mean": 5.0,
+    "std": 0.0,
+    "variance": 0.0,
+    "median": 5.0,
+    "min": 5,
+    "max": 5
+  },
+  "distance_reduced_m": {
+    "mean": 0.7111962056267218,
+    "std": 0.4377999466995975,
+    "variance": 0.1916687933301704,
+    "median": 0.7291538752207748,
+    "min": -0.8162244819518337,
+    "max": 1.8170005990952762
+  },
+  "time_saved_s": {
+    "mean": 1.4223924112534436,
+    "std": 0.875599893399195,
+    "variance": 0.7666751733206816,
+    "median": 1.4583077504415496,
+    "min": -1.6324489639036674,
+    "max": 3.6340011981905525
+  },
+  "episode_length": {
+    "mean": 8.858,
+    "std": 0.36583602884352434,
+    "variance": 0.13383599999999998,
+    "median": 9.0,
+    "min": 7,
+    "max": 9
+  },
+  "cubes_picked": {
+    "mean": 8.858,
+    "std": 0.36583602884352434,
+    "variance": 0.13383599999999998,
+    "median": 9.0,
+    "min": 7,
+    "max": 9
+  },
+  "units": {
+    "distance": "meters",
+    "time": "seconds",
+    "reward": "dimensionless",
+    "success_rate": "percentage"
+  }
+}

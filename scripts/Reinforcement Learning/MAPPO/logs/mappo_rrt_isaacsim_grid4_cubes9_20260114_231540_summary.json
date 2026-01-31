@@ -1,0 +1,43 @@
+{
+  "run_name": "mappo_rrt_isaacsim_grid4_cubes9_20260114_231540",
+  "total_episodes": 6,
+  "avg_reward": 12.231704908544751,
+  "avg_episode_length": 8.333333333333334,
+  "avg_reshuffles": 4.833333333333333,
+  "best_episode": {
+    "episode": 5,
+    "total_reward": 14.808065224022679,
+    "episode_length": 9,
+    "reshuffles_performed": 5,
+    "total_distance_reduced": 0.40403261201133983,
+    "total_time_saved": 0.8080652240226797,
+    "timestamp": "2026-01-14T23:18:47.792325",
+    "cube_0_final_dist": 0.3782908022403717,
+    "cube_1_final_dist": 0.5911248326301575,
+    "cube_2_final_dist": 0.41965827345848083,
+    "cube_3_final_dist": 0.6452745199203491,
+    "cube_4_final_dist": 0.5413991808891296,
+    "cube_5_final_dist": 0.3907851576805115,
+    "cube_6_final_dist": 0.516829788684845,
+    "cube_7_final_dist": 0.30481642484664917,
+    "cube_8_final_dist": 0.49066662788391113
+  },
+  "worst_episode": {
+    "episode": 6,
+    "total_reward": 8.039904739230682,
+    "episode_length": 4,
+    "reshuffles_performed": 4,
+    "total_distance_reduced": 0.019952369615341192,
+    "total_time_saved": 0.039904739230682384,
+    "timestamp": "2026-01-14T23:19:44.848420",
+    "cube_0_final_dist": 0.5468446016311646,
+    "cube_1_final_dist": 0.3907851576805115,
+    "cube_2_final_dist": 0.38555845618247986,
+    "cube_3_final_dist": 0.7088884711265564,
+    "cube_4_final_dist": 0.29295891523361206,
+    "cube_5_final_dist": 0.666267991065979,
+    "cube_6_final_dist": 0.5807337164878845,
+    "cube_7_final_dist": 0.3973827362060547,
+    "cube_8_final_dist": 0.6464619636535645
+  }
+}

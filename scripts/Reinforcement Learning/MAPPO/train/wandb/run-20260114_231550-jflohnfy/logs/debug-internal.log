@@ -1,0 +1,12 @@
+{"time":"2026-01-14T23:15:53.2978032+01:00","level":"INFO","msg":"stream: starting","core version":"0.23.0"}
+{"time":"2026-01-14T23:15:53.975292+01:00","level":"INFO","msg":"stream: created new stream","id":"jflohnfy"}
+{"time":"2026-01-14T23:15:53.975292+01:00","level":"INFO","msg":"handler: started","stream_id":"jflohnfy"}
+{"time":"2026-01-14T23:15:53.9777853+01:00","level":"INFO","msg":"stream: started","id":"jflohnfy"}
+{"time":"2026-01-14T23:15:53.9782858+01:00","level":"INFO","msg":"writer: started","stream_id":"jflohnfy"}
+{"time":"2026-01-14T23:15:53.9782858+01:00","level":"INFO","msg":"sender: started","stream_id":"jflohnfy"}
+{"time":"2026-01-14T23:19:45.6884559+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-01-14T23:19:46.0745896+01:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-01-14T23:19:46.0826088+01:00","level":"INFO","msg":"stream: closing","id":"jflohnfy"}
+{"time":"2026-01-14T23:19:46.0826088+01:00","level":"INFO","msg":"handler: closed","stream_id":"jflohnfy"}
+{"time":"2026-01-14T23:19:46.0831075+01:00","level":"INFO","msg":"sender: closed","stream_id":"jflohnfy"}
+{"time":"2026-01-14T23:19:46.0831075+01:00","level":"INFO","msg":"stream: closed","id":"jflohnfy"}

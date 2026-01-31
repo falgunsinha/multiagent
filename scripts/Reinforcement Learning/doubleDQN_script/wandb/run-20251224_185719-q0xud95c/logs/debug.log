@@ -1,0 +1,26 @@
+2025-12-24 18:57:19,654 INFO    MainThread:35124 [wandb_setup.py:_flush():80] Current SDK version is 0.23.0
+2025-12-24 18:57:19,654 INFO    MainThread:35124 [wandb_setup.py:_flush():80] Configure stats pid to 35124
+2025-12-24 18:57:19,654 INFO    MainThread:35124 [wandb_setup.py:_flush():80] Loading settings from C:\Users\Simulation\.config\wandb\settings
+2025-12-24 18:57:19,654 INFO    MainThread:35124 [wandb_setup.py:_flush():80] Loading settings from C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\wandb\settings
+2025-12-24 18:57:19,654 INFO    MainThread:35124 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2025-12-24 18:57:19,655 INFO    MainThread:35124 [wandb_init.py:setup_run_log_directory():713] Logging user logs to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\wandb\run-20251224_185719-q0xud95c\logs\debug.log
+2025-12-24 18:57:19,656 INFO    MainThread:35124 [wandb_init.py:setup_run_log_directory():714] Logging internal logs to C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\wandb\run-20251224_185719-q0xud95c\logs\debug-internal.log
+2025-12-24 18:57:19,656 INFO    MainThread:35124 [wandb_init.py:init():840] calling init triggers
+2025-12-24 18:57:19,656 INFO    MainThread:35124 [wandb_init.py:init():845] wandb.init called with sweep_config: {}
+config: {'method': 'rrt_isaacsim', 'grid_size': 4, 'num_cubes': 9, 'timesteps': 50000, 'learning_rate': 0.001, 'batch_size': 64, 'gamma': 0.99, 'epsilon_start': 1.0, 'epsilon_end': 0.01, 'epsilon_decay': 0.995, 'epsilon_decay_type': 'exponential', 'epsilon_decay_rate': 2500, 'target_update_tau': 0.005, 'warmup_steps': 1000, 'execute_picks': False, '_wandb': {}}
+2025-12-24 18:57:19,657 INFO    MainThread:35124 [wandb_init.py:init():888] starting backend
+2025-12-24 18:57:22,397 INFO    MainThread:35124 [wandb_init.py:init():891] sending inform_init request
+2025-12-24 18:57:22,429 INFO    MainThread:35124 [wandb_init.py:init():899] backend started and connected
+2025-12-24 18:57:22,430 INFO    MainThread:35124 [wandb_init.py:init():969] updated telemetry
+2025-12-24 18:57:22,431 INFO    MainThread:35124 [wandb_init.py:init():993] communicating run to backend with 90.0 second timeout
+2025-12-24 18:57:24,599 INFO    MainThread:35124 [wandb_init.py:init():1040] starting run threads in backend
+2025-12-24 18:57:28,657 INFO    MainThread:35124 [wandb_run.py:_console_start():2504] atexit reg
+2025-12-24 18:57:28,657 INFO    MainThread:35124 [wandb_run.py:_redirect():2352] redirect: wrap_raw
+2025-12-24 18:57:28,657 INFO    MainThread:35124 [wandb_run.py:_redirect():2421] Wrapping output streams.
+2025-12-24 18:57:28,657 INFO    MainThread:35124 [wandb_run.py:_redirect():2444] Redirects installed.
+2025-12-24 18:57:28,680 INFO    MainThread:35124 [wandb_init.py:init():1080] run started, returning control to user process
+2025-12-25 06:35:58,120 INFO    MainThread:35124 [wandb_run.py:_finish():2270] finishing run falgunsinha/ddqn-object-selection/q0xud95c
+2025-12-25 06:35:58,160 INFO    MainThread:35124 [wandb_run.py:_atexit_cleanup():2469] got exitcode: 0
+2025-12-25 06:35:58,170 INFO    MainThread:35124 [wandb_run.py:_restore():2451] restore
+2025-12-25 06:35:58,170 INFO    MainThread:35124 [wandb_run.py:_restore():2457] restore done
+2025-12-25 06:36:01,237 INFO    MainThread:35124 [wandb_run.py:_footer_sync_info():3853] logging synced files

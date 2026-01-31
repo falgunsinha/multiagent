@@ -1,0 +1,106 @@
+Initializing detailed logger...
+[LOGGER] Saving logs to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs
+[LOGGER] CSV: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs\mappo_astar_grid4_cubes9_20260115_000237_20260115_000252_episode_log.csv
+Starting training...
+Total timesteps: 50
+Buffer size: 256
+Batch size: 64
+================================================================================
+[RESHUFFLE] Updated cube 4 position to [0.58    0.03    0.02575] (simulation only)
+[RESHUFFLE] Cube 4: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.30747375 -0.22328882  0.05      ] (dist=0.720m)
+            New: [0.58    0.03    0.02575] (dist=0.891m)
+            Improvement: -0.171m (-23.7%)
+[RESHUFFLE] Updated cube 4 position to [ 0.32    -0.49     0.02575] (simulation only)
+[RESHUFFLE] Cube 4: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.58    0.03    0.02575] (dist=0.891m)
+            New: [ 0.32    -0.49     0.02575] (dist=0.864m)
+            Improvement: +0.027m (+3.0%)
+[RESHUFFLE] Updated cube 7 position to [0.32    0.29    0.02575] (simulation only)
+[RESHUFFLE] Cube 7: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.05294772 -0.20100614  0.05      ] (dist=0.605m)
+            New: [0.32    0.29    0.02575] (dist=0.768m)
+            Improvement: -0.163m (-26.9%)
+[RESHUFFLE] Updated cube 0 position to [0.58    0.03    0.02575] (simulation only)
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.558572   -0.22094668  0.05      ] (dist=0.886m)
+            New: [0.58    0.03    0.02575] (dist=0.891m)
+            Improvement: -0.005m (-0.5%)
+[RESHUFFLE] Updated cube 0 position to [ 0.32    -0.23     0.02575] (simulation only)
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.58    0.03    0.02575] (dist=0.891m)
+            New: [ 0.32    -0.23     0.02575] (dist=0.748m)
+            Improvement: +0.143m (+16.0%)
+Episode 0 | Steps 9 | Reward 10.16 | Length 9 | Reshuffles 5
+[RESHUFFLE] Updated cube 4 position to [0.32    0.03    0.02575] (simulation only)
+[RESHUFFLE] Cube 4: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.31636018 -0.50789684  0.05      ] (dist=0.857m)
+            New: [0.32    0.03    0.02575] (dist=0.712m)
+            Improvement: +0.145m (+16.9%)
+[RESHUFFLE] Updated cube 8 position to [0.32    0.29    0.02575] (simulation only)
+[RESHUFFLE] Cube 8: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.04738509 -0.25032672  0.05      ] (dist=0.622m)
+            New: [0.32    0.29    0.02575] (dist=0.768m)
+            Improvement: -0.146m (-23.5%)
+[RESHUFFLE] Updated cube 2 position to [ 0.32    -0.49     0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.5641591 0.0153641 0.05     ] (dist=0.862m)
+            New: [ 0.32    -0.49     0.02575] (dist=0.864m)
+            Improvement: -0.001m (-0.2%)
+Episode 1 | Steps 18 | Reward 5.99 | Length 9 | Reshuffles 3
+[RESHUFFLE] Updated cube 2 position to [0.32    0.29    0.02575] (simulation only)
+[RESHUFFLE] Cube 2: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.33145627 0.02320412 0.05      ] (dist=0.699m)
+            New: [0.32    0.29    0.02575] (dist=0.768m)
+            Improvement: -0.069m (-9.8%)
+[RESHUFFLE] Updated cube 6 position to [0.32    0.03    0.02575] (simulation only)
+[RESHUFFLE] Cube 6: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.8689301  -0.22900185  0.05      ] (dist=1.137m)
+            New: [0.32    0.03    0.02575] (dist=0.712m)
+            Improvement: +0.425m (+37.4%)
+[RESHUFFLE] Updated cube 1 position to [ 0.32    -0.49     0.02575] (simulation only)
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.83092   -0.5142294  0.05     ] (dist=1.197m)
+            New: [ 0.32    -0.49     0.02575] (dist=0.864m)
+            Improvement: +0.333m (+27.8%)
+[RESHUFFLE] Updated cube 3 position to [ 0.32    -0.23     0.02575] (simulation only)
+[RESHUFFLE] Cube 3: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.6002626 -0.2194586  0.05     ] (dist=0.917m)
+            New: [ 0.32    -0.23     0.02575] (dist=0.748m)
+            Improvement: +0.169m (+18.5%)
+Episode 2 | Steps 27 | Reward 21.22 | Length 9 | Reshuffles 4
+[RESHUFFLE] Updated cube 8 position to [0.32    0.29    0.02575] (simulation only)
+[RESHUFFLE] Cube 8: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.8103111  -0.48232633  0.05      ] (dist=1.168m)
+            New: [0.32    0.29    0.02575] (dist=0.768m)
+            Improvement: +0.400m (+34.2%)
+Traceback (most recent call last):
+  File "C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train\train_astar_mappo.py", line 404, in <module>
+    main()
+  File "C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\train\train_astar_mappo.py", line 233, in main
+    action, log_prob, value = policy.get_actions(obs_tensor, action_mask_tensor)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\algorithms\mappo_policy.py", line 210, in get_actions
+    action_dist = self.actor(obs, action_mask)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\isaacsim\kit\python\Lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\isaacsim\kit\python\Lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\algorithms\mappo_policy.py", line 91, in forward
+    return Categorical(logits=logits)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\isaacsim\kit\python\Lib\site-packages\torch\distributions\categorical.py", line 73, in __init__
+    super().__init__(batch_shape, validate_args=validate_args)
+  File "C:\isaacsim\kit\python\Lib\site-packages\torch\distributions\distribution.py", line 72, in __init__
+    raise ValueError(
+ValueError: Expected parameter logits (Tensor of shape (1, 144)) of distribution Categorical(logits: torch.Size([1, 144])) to satisfy the constraint IndependentConstraint(Real(), 1), but found invalid values:
+tensor([[nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+         nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+         nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+         nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+         nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+         nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan]],
+       device='cuda:0')

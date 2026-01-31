@@ -1,0 +1,19 @@
+# Requirements for RL-Based Object Selection
+# Install with: C:\isaacsim\python.bat -m pip install -r requirements.txt
+
+# IMPORTANT: See OPENCV_PYGAME_ANALYSIS.md before installing!
+
+# CRITICAL: NumPy version constraint for Isaac Sim compatibility
+# Isaac Lab, scipy, nvidia-srl-usd, and numba all require numpy<2.0.0
+numpy<2.0.0,>=1.24.0
+
+# CRITICAL: OpenCV headless version for Isaac Sim compatibility
+# opencv-python requires numpy>=2 which breaks Isaac Sim!
+# Use opencv-python-headless instead (already installed, but pinning version)
+opencv-python-headless>=4.8.0,<5.0.0
+
+# Core RL framework (NOT in Isaac Sim - needs installation)
+stable-baselines3[extra]>=2.0.0
+
+# Pygame for visualization (NOT in Isaac Sim - SAFE to install)
+pygame>=2.5.0

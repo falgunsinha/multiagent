@@ -1,0 +1,61 @@
+# Experiment 6: Action Space Analysis (Continuous)
+experiment:
+  name: "Action Space Analysis"
+  id: "exp6"
+  description: "How does continuous action mapping affect performance?"
+  
+# Use best continuous model (likely TD3)
+model:
+  name: "TD3"
+  path: "4.2 TD3/model/LLdV2_actor1000.pth"
+  type: "continuous"
+  state_dim: 8
+  action_dim: 2
+  
+action_adapters:
+  - type: "nearest_object"
+    name: "Nearest Object Selection"
+    description: "Select object closest to continuous action (Euclidean distance)"
+    
+  - type: "weighted_selection"
+    name: "Weighted Selection"
+    description: "Distance + reachability weighted selection"
+    distance_weight: 0.6
+    reachability_weight: 0.4
+    
+  - type: "probabilistic_selection"
+    name: "Probabilistic Selection"
+    description: "Softmax over distances"
+    temperature: 1.0
+
+testing:
+  episodes_per_adapter: 100
+  max_steps_per_episode: 50
+  num_cubes: 9
+  grid_size: 4
+  headless: true
+  
+state_adapter:
+  type: "feature_aggregation"
+  input_dim: 24
+  output_dim: 8
+  
+metrics:
+  - success_rate
+  - avg_reward
+  - avg_steps
+  - collision_rate
+  - invalid_actions
+  - inference_time
+  
+wandb:
+  project: "exp-rl-models"
+  entity: "falgunsinha"
+  tags: ["action_adapter", "continuous", "pretrained"]
+  
+output:
+  results_dir: "results/exp6_action_space_analysis"
+  save_csv: true
+  save_json: true
+  save_plots: true
+

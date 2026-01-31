@@ -1,0 +1,268 @@
+WandB initialized: grid4x4_9cubes_isaacsim_test
+Initializing detailed logger...
+[LOGGER] Saving logs to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs
+[LOGGER] CSV: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs\mappo_rrt_isaacsim_grid4_cubes9_20260114_231540_20260114_231555_episode_log.csv
+
+Creating Franka RRT Trainer...
+[TRAINER] Initializing Franka RRT Trainer for MAPPO
+[TRAINER] Grid: 4x4, Cubes: 9
+[TRAINER] Setting up scene...
+[TRAINER] Initializing RRT planner...
+[TRAINER] RRT planner and kinematics solvers initialized
+[TRAINER] Adding container...
+[TRAINER] Creating random obstacles in empty cells...
+[TRAINER] Scene setup complete
+
+Creating Isaac Sim RRT environment...
+[IsaacSimRRT] All components initialized - using actual Isaac Sim RRT
+Isaac Sim environment created with Franka controller and RRT planner
+
+Loading frozen DDQN agent (Agent 1)...
+[Double DQN] Initialized agent on cuda
+[Double DQN] State dim: 96, Action dim: 16
+[Double DQN] Epsilon decay: multiplicative
+[Double DQN] Target update: soft (tau=0.005)
+[Double DQN] Warmup steps: 1000
+[Double DQN] Loaded checkpoint from C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_isaacsim_grid4_cubes9_20251224_185752_final.pt
+[Double DQN] Epsilon: 0.0100, Steps: 50000, Episodes: 5556
+[Double DQN] Loaded 49001 loss values
+[Double DQN] Loaded 49001 Q-value records
+DDQN agent loaded from C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models\ddqn_rrt_isaacsim_grid4_cubes9_20251224_185752_final.pt and frozen
+
+Creating two-agent environment...
+Two-agent environment created
+
+Creating MAPPO policy (Agent 2)...
+MAPPO policy created: obs_dim=65, action_dim=144
+MAPPO trainer created
+Rollout buffer created: size=256
+
+Initialization complete. Starting training...
+================================================================================
+[RESHUFFLE] Moved cube 0 (Cube_1) to [ 0.645   -0.295    0.02575]
+[RESHUFFLE] Cube 0: CROWDED_AREA (priority=3)
+            Old: [ 0.5193079  -0.27820164  0.02574974] (dist=0.590m)
+            New: [ 0.645   -0.295    0.02575] (dist=0.710m)
+            Improvement: -0.120m (-20.4%)
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] Cube 0 unreachable after 1 RRT attempts.
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] All 1 attempts failed for Cube_1
+[RESHUFFLE] Moved cube 3 (Cube_4) to [ 0.255   -0.295    0.02575]
+[RESHUFFLE] Cube 3: CROWDED_AREA (priority=3)
+            Old: [ 0.5174709 -0.1822223  0.0257498] (dist=0.549m)
+            New: [ 0.255   -0.295    0.02575] (dist=0.391m)
+            Improvement: +0.158m (+28.8%)
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] All 1 attempts failed for Cube_1
+[ENV RRT] All 1 attempts failed for Cube_1
+[RESHUFFLE] Moved cube 0 (Cube_1) to [ 0.515   -0.295    0.02575]
+[RESHUFFLE] Cube 0: CROWDED_AREA (priority=3)
+            Old: [ 0.645   -0.295    0.02575] (dist=0.710m)
+            New: [ 0.515   -0.295    0.02575] (dist=0.594m)
+            Improvement: +0.116m (+16.3%)
+[RESHUFFLE] Moved cube 7 (Cube_8) to [ 0.645   -0.295    0.02575]
+[RESHUFFLE] Cube 7: CROWDED_AREA (priority=3)
+            Old: [0.25514415 0.08100082 0.02574976] (dist=0.269m)
+            New: [ 0.645   -0.295    0.02575] (dist=0.710m)
+            Improvement: -0.441m (-163.9%)
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[RESHUFFLE] Moved cube 7 (Cube_8) to [ 0.645   -0.035    0.02575]
+[RESHUFFLE] Cube 7: CROWDED_AREA (priority=3)
+            Old: [ 0.645   -0.295    0.02575] (dist=0.710m)
+            New: [ 0.645   -0.035    0.02575] (dist=0.646m)
+            Improvement: +0.063m (+8.9%)
+[RESHUFFLE] Moved cube 0 (Cube_1) to [0.385   0.095   0.02575]
+[RESHUFFLE] Cube 0: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.27488637 0.08338164 0.02574974] (dist=0.288m)
+            New: [0.385   0.095   0.02575] (dist=0.397m)
+            Improvement: -0.109m (-37.8%)
+[RESHUFFLE] Moved cube 3 (Cube_4) to [ 0.515   -0.035    0.02575]
+[RESHUFFLE] Cube 3: CROWDED_AREA (priority=3)
+            Old: [ 0.6507602 -0.1683901  0.0257497] (dist=0.673m)
+            New: [ 0.515   -0.035    0.02575] (dist=0.517m)
+            Improvement: +0.156m (+23.2%)
+[RESHUFFLE] Moved cube 5 (Cube_6) to [ 0.645   -0.165    0.02575]
+[RESHUFFLE] Cube 5: FAR_CUBE (priority=2)
+            Old: [0.65632355 0.0967591  0.02574964] (dist=0.664m)
+            New: [ 0.645   -0.165    0.02575] (dist=0.666m)
+            Improvement: -0.002m (-0.4%)
+[RESHUFFLE] Moved cube 8 (Cube_9) to [ 0.385   -0.165    0.02575]
+[RESHUFFLE] Cube 8: CROWDED_AREA (priority=3)
+            Old: [ 0.3847513  -0.3096195   0.02574976] (dist=0.495m)
+            New: [ 0.385   -0.165    0.02575] (dist=0.420m)
+            Improvement: +0.075m (+15.1%)
+[RESHUFFLE] Moved cube 7 (Cube_8) to [ 0.645   -0.035    0.02575]
+[RESHUFFLE] Cube 7: FAR_CUBE (priority=2)
+            Old: [ 0.37046045 -0.05198594  0.0257497 ] (dist=0.375m)
+            New: [ 0.645   -0.035    0.02575] (dist=0.646m)
+            Improvement: -0.271m (-72.4%)
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[RESHUFFLE] Moved cube 5 (Cube_6) to [ 0.255   -0.295    0.02575]
+[RESHUFFLE] Cube 5: UNREACHABLE_DISTANCE (priority=3)
+            Old: [0.37618446 0.10356387 0.02574975] (dist=0.391m)
+            New: [ 0.255   -0.295    0.02575] (dist=0.391m)
+            Improvement: +0.000m (+0.1%)
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[RESHUFFLE] Moved cube 8 (Cube_9) to [ 0.515   -0.295    0.02575]
+[RESHUFFLE] Cube 8: CROWDED_AREA (priority=3)
+            Old: [ 0.630693   -0.04026299  0.02574969] (dist=0.633m)
+            New: [ 0.515   -0.295    0.02575] (dist=0.594m)
+            Improvement: +0.038m (+6.1%)
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[RESHUFFLE] Moved cube 8 (Cube_9) to [ 0.645   -0.035    0.02575]
+[RESHUFFLE] Cube 8: CROWDED_AREA (priority=3)
+            Old: [ 0.515   -0.295    0.02575] (dist=0.594m)
+            New: [ 0.645   -0.035    0.02575] (dist=0.646m)
+            Improvement: -0.052m (-8.8%)
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[ENV RRT] All 1 attempts failed for Cube_8
+[RESHUFFLE] Moved cube 7 (Cube_8) to [ 0.515   -0.295    0.02575]
+[RESHUFFLE] Cube 7: CROWDED_AREA (priority=3)
+            Old: [ 0.66108704 -0.28202116  0.02574968] (dist=0.719m)
+            New: [ 0.515   -0.295    0.02575] (dist=0.594m)
+            Improvement: +0.125m (+17.4%)
+[RESHUFFLE] Moved cube 4 (Cube_5) to [ 0.645   -0.295    0.02575]
+[RESHUFFLE] Cube 4: CROWDED_AREA (priority=3)
+            Old: [ 0.38094833 -0.17874435  0.02574974] (dist=0.422m)
+            New: [ 0.645   -0.295    0.02575] (dist=0.710m)
+            Improvement: -0.288m (-68.3%)
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] Cube 4 unreachable after 1 RRT attempts.
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] All 1 attempts failed for Cube_5
+[ENV RRT] No valid actions remaining (all remaining cubes unreachable)
+[ENV RRT] Successfully picked: 8/9, Unreachable: 1
+[RESHUFFLE] Moved cube 0 (Cube_1) to [ 0.255   -0.165    0.02575]
+[RESHUFFLE] Cube 0: CROWDED_AREA (priority=3)
+            Old: [ 0.64297545 -0.1480987   0.02574972] (dist=0.660m)
+            New: [ 0.255   -0.165    0.02575] (dist=0.305m)
+            Improvement: +0.355m (+53.8%)
+[RESHUFFLE] Moved cube 6 (Cube_7) to [ 0.645   -0.165    0.02575]
+[RESHUFFLE] Cube 6: CROWDED_AREA (priority=3)
+            Old: [ 0.5055134  -0.29678944  0.02574972] (dist=0.587m)
+            New: [ 0.645   -0.165    0.02575] (dist=0.666m)
+            Improvement: -0.080m (-13.5%)
+[RESHUFFLE] Moved cube 5 (Cube_6) to [ 0.515   -0.295    0.02575]
+[RESHUFFLE] Cube 5: CROWDED_AREA (priority=3)
+            Old: [ 0.24788044 -0.01712924  0.02574976] (dist=0.250m)
+            New: [ 0.515   -0.295    0.02575] (dist=0.594m)
+            Improvement: -0.344m (-137.8%)
+[RESHUFFLE] Moved cube 7 (Cube_8) to [ 0.645   -0.035    0.02575]
+[RESHUFFLE] Cube 7: CROWDED_AREA (priority=3)
+            Old: [ 0.3927302  -0.1680484   0.02574978] (dist=0.428m)
+            New: [ 0.645   -0.035    0.02575] (dist=0.646m)
+            Improvement: -0.219m (-51.1%)
+[RESHUFFLE] Moved cube 1 (Cube_2) to [ 0.255   -0.295    0.02575]
+[RESHUFFLE] Cube 1: UNREACHABLE_DISTANCE (priority=3)
+            Old: [ 0.49829996 -0.04494051  0.02574973] (dist=0.501m)
+            New: [ 0.255   -0.295    0.02575] (dist=0.391m)
+            Improvement: +0.110m (+22.0%)
+[RESHUFFLE] Moved cube 6 (Cube_7) to [ 0.515   -0.035    0.02575]
+[RESHUFFLE] Cube 6: CROWDED_AREA (priority=3)
+            Old: [ 0.663975   -0.17503326  0.02574972] (dist=0.687m)
+            New: [ 0.515   -0.035    0.02575] (dist=0.517m)
+            Improvement: +0.170m (+24.8%)
+[RESHUFFLE] Moved cube 2 (Cube_3) to [ 0.385   -0.165    0.02575]
+[RESHUFFLE] Cube 2: FAR_CUBE (priority=2)
+            Old: [ 0.2506666  -0.03952375  0.02574975] (dist=0.255m)
+            New: [ 0.385   -0.165    0.02575] (dist=0.420m)
+            Improvement: -0.165m (-64.5%)
+[RESHUFFLE] Moved cube 7 (Cube_8) to [ 0.255   -0.165    0.02575]
+[RESHUFFLE] Cube 7: CROWDED_AREA (priority=3)
+            Old: [ 0.24679667 -0.2928958   0.02574975] (dist=0.384m)
+            New: [ 0.255   -0.165    0.02575] (dist=0.305m)
+            Improvement: +0.079m (+20.6%)
+[RESHUFFLE] Moved cube 5 (Cube_6) to [ 0.255   -0.295    0.02575]
+[RESHUFFLE] Cube 5: CROWDED_AREA (priority=3)
+            Old: [ 0.5187329  -0.18398309  0.02574974] (dist=0.551m)
+            New: [ 0.255   -0.295    0.02575] (dist=0.391m)
+            Improvement: +0.160m (+29.1%)
+[RESHUFFLE] Moved cube 4 (Cube_5) to [ 0.515   -0.165    0.02575]
+[RESHUFFLE] Cube 4: CROWDED_AREA (priority=3)
+            Old: [ 0.63810766 -0.2877098   0.02574972] (dist=0.700m)
+            New: [ 0.515   -0.165    0.02575] (dist=0.541m)
+            Improvement: +0.159m (+22.7%)
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[RESHUFFLE] Moved cube 1 (Cube_2) to [ 0.255   -0.295    0.02575]
+[RESHUFFLE] Cube 1: CROWDED_AREA (priority=3)
+            Old: [0.6459811  0.10315812 0.02574763] (dist=0.655m)
+            New: [ 0.255   -0.295    0.02575] (dist=0.391m)
+            Improvement: +0.264m (+40.3%)
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[RESHUFFLE] Moved cube 8 (Cube_9) to [ 0.645   -0.035    0.02575]
+[RESHUFFLE] Cube 8: CROWDED_AREA (priority=3)
+            Old: [ 0.532971   -0.05058083  0.02574767] (dist=0.536m)
+            New: [ 0.645   -0.035    0.02575] (dist=0.646m)
+            Improvement: -0.110m (-20.6%)
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[RESHUFFLE] Moved cube 5 (Cube_6) to [ 0.645   -0.165    0.02575]
+[RESHUFFLE] Cube 5: FAR_CUBE (priority=2)
+            Old: [ 0.40314168 -0.30757642  0.02574768] (dist=0.508m)
+            New: [ 0.645   -0.165    0.02575] (dist=0.666m)
+            Improvement: -0.159m (-31.2%)
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+[RESHUFFLE] Moved cube 7 (Cube_8) to [0.385   0.095   0.02575]
+[RESHUFFLE] Cube 7: CROWDED_AREA (priority=3)
+            Old: [ 0.3853496  -0.1712256   0.02574766] (dist=0.422m)
+            New: [0.385   0.095   0.02575] (dist=0.397m)
+            Improvement: +0.025m (+5.9%)
+[ENV RRT] All 1 attempts failed for Cube_4
+[ENV RRT] All 1 attempts failed for Cube_4
+
+Training complete! Final model saved: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\models\mappo_rrt_isaacsim_grid4_cubes9_20260114_231540_final.pt
+
+[LOGGER] Training summary saved to: C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO\logs\mappo_rrt_isaacsim_grid4_cubes9_20260114_231540_summary.json
+[LOGGER] Total episodes: 6
+[LOGGER] Average reward: 12.23
+[LOGGER] Average reshuffles: 4.83
+[LOGGER] Logs saved successfully!

@@ -1,0 +1,59 @@
+# Experiment 3: State Adapter Ablation
+experiment:
+  name: "State Adapter Ablation"
+  id: "exp3"
+  description: "Determine which state compression method works best"
+  
+# Use best performing model from Exp1 (will be updated after Exp1 results)
+model:
+  name: "SAC-Discrete"
+  path: "5.1 SAC-Discrete/model/sacd_actor_400_LLdV2.pth"
+  type: "discrete"
+  state_dim: 8
+  action_dim: 4
+  
+state_adapters:
+  - type: "feature_aggregation"
+    name: "Feature Aggregation"
+    description: "Semantic feature engineering (24D→8D)"
+    
+  - type: "pca"
+    name: "PCA Projection"
+    description: "Principal Component Analysis (24D→8D)"
+    n_components: 8
+    
+  - type: "random_projection"
+    name: "Random Projection"
+    description: "Random projection matrix (24D→8D)"
+    n_components: 8
+    random_seed: 42
+
+testing:
+  episodes_per_adapter: 100
+  max_steps_per_episode: 50
+  num_cubes: 9
+  grid_size: 4
+  headless: true
+  
+action_adapter:
+  type: "discrete_mapper"
+  
+metrics:
+  - success_rate
+  - avg_reward
+  - avg_steps
+  - collision_rate
+  - invalid_actions
+  - inference_time
+  
+wandb:
+  project: "exp-rl-models"
+  entity: "falgunsinha"
+  tags: ["state_adapter", "ablation", "pretrained"]
+  
+output:
+  results_dir: "results/exp3_state_adapter_ablation"
+  save_csv: true
+  save_json: true
+  save_plots: true
+
