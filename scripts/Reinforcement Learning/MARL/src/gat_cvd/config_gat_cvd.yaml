@@ -1,0 +1,112 @@
+# GAT + CVD Configuration File
+# Hyperparameters for Graph Attention Network + Counterfactual Value Decomposition
+
+# Environment
+env:
+  name: "ObjectRearrangement"
+  max_objects: 10
+  grid_size: [6, 6]
+  n_robots: 2
+  max_episode_steps: 100
+
+# Graph Construction
+graph:
+  node_dim: 7  # [x, y, z, is_robot, is_obstacle, is_target, object_id]
+  edge_dim: 3  # [distance, reachability, blocking_score]
+  edge_threshold: 2.0  # Distance threshold for creating edges
+  use_reachability_edges: true  # Use RRT for reachability
+  use_blocking_scores: true  # Compute blocking relationships
+
+# GAT Encoder
+gat:
+  hidden_dim: 128
+  output_dim: 128
+  num_layers: 2
+  num_heads: 4
+  dropout: 0.1
+  concat_heads: true  # Concatenate attention heads (except last layer)
+
+# DDQN (Agent 1 - Object Selection)
+ddqn:
+  n_actions: 10  # Max objects
+  epsilon_start: 1.0
+  epsilon_end: 0.01
+  epsilon_decay: 0.995
+  buffer_size: 10000
+  batch_size: 32
+  target_update_freq: 100  # Hard update frequency (if not using soft update)
+  use_double_dqn: true
+
+# MASAC (Agent 2 - Spatial Manipulation)
+masac:
+  n_actions: 5  # [move_up, move_down, move_left, move_right, grasp]
+  epsilon_start: 0.5
+  epsilon_end: 0.01
+  epsilon_decay: 0.995
+  use_entropy_regularization: true
+  target_entropy: -5.0  # -|A| for discrete actions
+
+# CVD (Counterfactual Value Decomposition)
+cvd:
+  hidden_dim: 64
+  n_agents: 2
+  use_counterfactual_targets: true
+
+# Training
+training:
+  n_episodes: 10000
+  max_steps_per_episode: 100
+  batch_size: 32
+  replay_buffer_size: 50000
+  learning_rate: 0.0003
+  gamma: 0.99  # Discount factor
+  tau: 0.005  # Soft update coefficient
+  update_freq: 1  # Update every N steps
+  target_update_freq: 1  # Soft update every N steps
+  save_freq: 100  # Save model every N episodes
+  eval_freq: 50  # Evaluate every N episodes
+  n_eval_episodes: 10
+  # Epsilon schedules for exploration
+  epsilon_start_ddqn: 1.0
+  epsilon_end_ddqn: 0.01
+  epsilon_decay_ddqn: 0.995
+  epsilon_start_masac: 0.5
+  epsilon_end_masac: 0.01
+  epsilon_decay_masac: 0.995
+
+# Optimization
+optimizer:
+  type: "Adam"
+  lr: 0.0003
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  weight_decay: 0.0
+
+# Logging
+logging:
+  log_dir: "./logs/gat_cvd"
+  tensorboard: true
+  wandb: false
+  save_video: false
+  print_freq: 10  # Print every N episodes
+
+# Device
+device: "cuda"  # "cuda" or "cpu"
+
+# Seed
+seed: 42
+
+# Checkpointing
+checkpoint:
+  save_dir: "./checkpoints/gat_cvd"
+  load_checkpoint: null  # Path to checkpoint to load (null for training from scratch)
+  save_best: true  # Save best model based on eval reward
+
+# Ablation Studies (for experiments)
+ablation:
+  use_gat: true  # If false, use MLP encoder
+  use_cvd: true  # If false, use QMIX
+  use_reachability: true  # If false, don't use reachability edges
+  use_blocking: true  # If false, don't use blocking scores
+  use_shared_encoder: true  # If false, use separate encoders for DDQN and MASAC
+
