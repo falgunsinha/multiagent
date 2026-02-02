@@ -1,8 +1,4 @@
-"""
-Franka RRT Interactive Pick and Place - Standalone Version
-All-in-one script for Isaac Sim Script Editor
-Creates pyramid stack of cuboids and picks/places them using Lula RRT
-"""
+
 
 import asyncio
 import time
@@ -14,7 +10,6 @@ import omni.ui as ui
 from omni.kit.async_engine import run_coroutine
 import omni.timeline
 
-# Isaac Sim imports
 from isaacsim.core.api import World
 from isaacsim.core.prims import SingleXFormPrim
 from isaacsim.core.utils.stage import add_reference_to_stage
@@ -26,8 +21,31 @@ from isaacsim.robot_motion.motion_generation import PathPlannerVisualizer
 from isaacsim.robot_motion.motion_generation.lula import RRT
 from pxr import UsdPhysics
 
-# Add project root to path for local imports
-project_root = Path(r"C:\isaacsim\cobotproject")
+project_root = None
+
+try:
+    if '__file__' in globals():
+        current_file = Path(__file__).resolve()
+        project_root = current_file.parent.parent.parent
+except:
+    pass
+
+if project_root is None or not project_root.exists():
+    try:
+        cwd = Path(os.getcwd())
+        if cwd.name == "multiagent":
+            project_root = cwd
+        else:
+            for parent in [cwd] + list(cwd.parents):
+                if parent.name == "multiagent":
+                    project_root = parent
+                    break
+    except:
+        pass
+
+if project_root is None:
+    project_root = Path.cwd()
+
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
@@ -35,96 +53,75 @@ from src.manipulators import SingleManipulator
 from src.grippers import ParallelGripper
 
 
-# ============================================================================
-# SCENE SETUP CLASS
-# ============================================================================
-
 class SceneSetup:
-    """Manages the static scene elements: Franka, Container, Ground Plane"""
-    
+    """Manages the static scene elements: Cobot, Container, Ground Plane"""
+
     def __init__(self):
         self.world = None
-        self.franka = None
+        self.cobot = None
         self.gripper = None
         self.container = None
         self.container_position = np.array([-0.3, -0.5, 0.0])
         self.container_scale = np.array([0.3, 0.3, 0.3])
-    
+
     def setup_world(self):
         """Create World with optimized physics settings"""
-        print("\n=== Setting up World ===")
-        
-        # Clear any existing world
         if World.instance():
             World.instance().clear_instance()
-        
-        # Create new world with optimized physics
+
         self.world = World(
             stage_units_in_meters=1.0,
-            physics_dt=1.0/60.0,  # 60 Hz physics
-            rendering_dt=1.0/60.0  # 60 Hz rendering
+            physics_dt=1.0/60.0,
+            rendering_dt=1.0/60.0
         )
-        
-        print("World created successfully!")
+
         return self.world
-    
+
     def add_ground_plane(self):
         """Add default ground plane"""
-        print("\n=== Adding Ground Plane ===")
         self.world.scene.add_default_ground_plane()
-        print("Ground plane added!")
-    
-    def add_franka(self):
-        """Add Franka robot and gripper"""
-        print("\n=== Adding Franka Robot ===")
 
-        franka_name = f"franka_{int(time.time() * 1000)}"
-        franka_prim_path = f"/World/Franka_{int(time.time() * 1000)}"
+    def add_cobot(self):
+        """Add cobot and gripper"""
 
-        # Add the USD reference to the stage (use the standard franka.usd)
-        franka_usd_path = get_assets_root_path() + "/Isaac/Robots/FrankaRobotics/FrankaPanda/franka.usd"
-        robot_prim = add_reference_to_stage(usd_path=franka_usd_path, prim_path=franka_prim_path)
+        cobot_name = f"cobot_{int(time.time() * 1000)}"
+        cobot_prim_path = f"/World/Cobot_{int(time.time() * 1000)}"
 
-        # Set variant selections for gripper and mesh quality
+        cobot_usd_path = get_assets_root_path() + "/Isaac/Robots/FrankaRobotics/FrankaPanda/franka.usd"
+        robot_prim = add_reference_to_stage(usd_path=cobot_usd_path, prim_path=cobot_prim_path)
+
         robot_prim.GetVariantSet("Gripper").SetVariantSelection("AlternateFinger")
         robot_prim.GetVariantSet("Mesh").SetVariantSelection("Quality")
 
-        # Create gripper (use panda_rightfinger as end effector)
         self.gripper = ParallelGripper(
-            end_effector_prim_path=f"{franka_prim_path}/panda_rightfinger",
+            end_effector_prim_path=f"{cobot_prim_path}/panda_rightfinger",
             joint_prim_names=["panda_finger_joint1", "panda_finger_joint2"],
             joint_opened_positions=np.array([0.05, 0.05]),
             joint_closed_positions=np.array([0.02, 0.02]),
             action_deltas=np.array([0.01, 0.01])
         )
 
-        # Now wrap it as a SingleManipulator
-        self.franka = self.world.scene.add(
+        self.cobot = self.world.scene.add(
             SingleManipulator(
-                prim_path=franka_prim_path,
-                name=franka_name,
-                end_effector_prim_path=f"{franka_prim_path}/panda_rightfinger",
+                prim_path=cobot_prim_path,
+                name=cobot_name,
+                end_effector_prim_path=f"{cobot_prim_path}/panda_rightfinger",
                 gripper=self.gripper,
                 position=np.array([0.0, 0.0, 0.0]),
                 orientation=np.array([1.0, 0.0, 0.0, 0.0])
             )
         )
 
-        print(f"Franka added: {franka_name}")
-        return self.franka, self.gripper
+        return self.cobot, self.gripper
     
     def add_container(self):
         """Add warehouse container with physics"""
-        print("\n=== Adding Container ===")
-        
         container_prim_path = "/World/Container"
-        
-        # Add container USD reference
+
         container_usd_path = f"{get_assets_root_path()}/NVIDIA/Assets/DigitalTwin/Assets/Warehouse/Storage/Containers/Container_I/Container_I04_160x120x64cm_PR_V_NVD_01.usd"
-        
+
         add_reference_to_stage(usd_path=container_usd_path, prim_path=container_prim_path)
-        
-        # Create XForm prim for container
+
         self.container = self.world.scene.add(
             SingleXFormPrim(
                 prim_path=container_prim_path,
@@ -133,52 +130,36 @@ class SceneSetup:
                 scale=self.container_scale
             )
         )
-        
-        # Add physics to container
+
         from omni.isaac.core.utils.stage import get_current_stage
         stage = get_current_stage()
         container_prim = stage.GetPrimAtPath(container_prim_path)
-        
-        # Add rigid body (kinematic/static)
+
         rigid_body_api = UsdPhysics.RigidBodyAPI.Apply(container_prim)
         rigid_body_api.CreateKinematicEnabledAttr(True)
-        
-        # Add collision
+
         UsdPhysics.CollisionAPI.Apply(container_prim)
-        
-        print(f"Container added at position: {self.container_position}")
+
         return self.container
-    
-    def initialize_franka(self):
-        """Initialize Franka with default joint positions for RRT"""
-        print("\n=== Initializing Franka ===")
-        
-        # Set default joint positions for 7 arm joints + 2 gripper joints
+
+    def initialize_cobot(self):
+        """Initialize cobot with default joint positions for RRT"""
         default_joint_positions = np.array([0.0, -1.3, 0.0, -2.87, 0.0, 2.0, 0.75, 0.04, 0.04])
-        
-        # Set default state for joints
-        self.franka.set_joints_default_state(positions=default_joint_positions)
-        
-        # Set gripper default state
+
+        self.cobot.set_joints_default_state(positions=default_joint_positions)
         self.gripper.set_default_state(self.gripper.joint_opened_positions)
-        
-        print("Franka initialized with default configuration")
-    
+
     def setup_complete_scene(self):
         """Setup complete scene with all elements"""
         self.setup_world()
         self.add_ground_plane()
-        self.add_franka()
+        self.add_cobot()
         self.add_container()
-        
-        # Reset world to initialize everything
+
         self.world.reset()
-        
-        # Initialize Franka after reset
-        self.initialize_franka()
-        
-        print("\n=== Scene Setup Complete! ===\n")
-        return self.world, self.franka, self.gripper, self.container
+        self.initialize_cobot()
+
+        return self.world, self.cobot, self.gripper, self.container
     
     def get_container_info(self):
         """Get container position and dimensions"""
@@ -395,9 +376,9 @@ class PickPlaceState:
 class RRTController:
     """Manages RRT motion planning and pick/place execution"""
 
-    def __init__(self, world, franka, gripper, container_info):
+    def __init__(self, world, cobot, gripper, container_info):
         self.world = world
-        self.franka = franka
+        self.cobot = cobot
         self.gripper = gripper
         self.container_info = container_info
 
@@ -443,9 +424,8 @@ class RRTController:
         # Set max iterations after creation
         self.rrt.set_max_iterations(10000)
 
-        # Create path planner visualizer
         self.path_planner_visualizer = PathPlannerVisualizer(
-            robot_articulation=self.franka,
+            robot_articulation=self.cobot,
             path_planner=self.rrt
         )
 
@@ -516,11 +496,10 @@ class RRTController:
         if self.state == PickPlaceState.IDLE or self.state == PickPlaceState.DONE:
             return False
 
-        # State 1: Moving to pick approach position (above cube)
         if self.state == PickPlaceState.MOVING_TO_PICK_APPROACH:
             if self.current_plan and self.plan_index < len(self.current_plan):
                 action = self.current_plan[self.plan_index]
-                self.franka.apply_action(action)
+                self.cobot.apply_action(action)
                 self.plan_index += 1
                 await omni.kit.app.get_app().next_update_async()
                 return True
@@ -552,11 +531,10 @@ class RRTController:
                 self.plan_index = 0
                 return True
 
-        # State 2: Descending to pick position
         elif self.state == PickPlaceState.DESCENDING_TO_PICK:
             if self.current_plan and self.plan_index < len(self.current_plan):
                 action = self.current_plan[self.plan_index]
-                self.franka.apply_action(action)
+                self.cobot.apply_action(action)
                 self.plan_index += 1
                 await omni.kit.app.get_app().next_update_async()
                 return True
@@ -592,11 +570,10 @@ class RRTController:
             self.plan_index = 0
             return True
 
-        # State 4: Ascending from pick
         elif self.state == PickPlaceState.ASCENDING_FROM_PICK:
             if self.current_plan and self.plan_index < len(self.current_plan):
                 action = self.current_plan[self.plan_index]
-                self.franka.apply_action(action)
+                self.cobot.apply_action(action)
                 self.plan_index += 1
                 await omni.kit.app.get_app().next_update_async()
                 return True
@@ -635,11 +612,10 @@ class RRTController:
                 self.state = PickPlaceState.MOVING_TO_PLACE_APPROACH
                 return True
 
-        # State 5: Moving to place approach position
         elif self.state == PickPlaceState.MOVING_TO_PLACE_APPROACH:
             if self.current_plan and self.plan_index < len(self.current_plan):
                 action = self.current_plan[self.plan_index]
-                self.franka.apply_action(action)
+                self.cobot.apply_action(action)
                 self.plan_index += 1
                 await omni.kit.app.get_app().next_update_async()
                 return True
@@ -661,11 +637,10 @@ class RRTController:
                 self.plan_index = 0
                 return True
 
-        # State 6: Descending to place position
         elif self.state == PickPlaceState.DESCENDING_TO_PLACE:
             if self.current_plan and self.plan_index < len(self.current_plan):
                 action = self.current_plan[self.plan_index]
-                self.franka.apply_action(action)
+                self.cobot.apply_action(action)
                 self.plan_index += 1
                 await omni.kit.app.get_app().next_update_async()
                 return True
@@ -700,11 +675,10 @@ class RRTController:
             self.plan_index = 0
             return True
 
-        # State 8: Ascending from place
         elif self.state == PickPlaceState.ASCENDING_FROM_PLACE:
             if self.current_plan and self.plan_index < len(self.current_plan):
                 action = self.current_plan[self.plan_index]
-                self.franka.apply_action(action)
+                self.cobot.apply_action(action)
                 self.plan_index += 1
                 await omni.kit.app.get_app().next_update_async()
                 return True
@@ -734,7 +708,7 @@ class RRTController:
 # MAIN INTERACTIVE UI CLASS
 # ============================================================================
 
-class FrankaRRTInteractive:
+class CobotRRTInteractive:
     """Main class for interactive RRT pick and place with UI"""
 
     def __init__(self, base_layer_count=4, num_layers=4):
@@ -742,21 +716,19 @@ class FrankaRRTInteractive:
         Initialize interactive RRT system
 
         Args:
-            base_layer_count: Number of cuboids in bottom layer of pyramid
+            base_layer_count: Number of objects in bottom layer of pyramid
             num_layers: Total number of layers in pyramid
         """
         # Pyramid configuration
         self.base_layer_count = base_layer_count
         self.num_layers = num_layers
 
-        # Components
         self.scene_setup = None
         self.object_manager = None
         self.rrt_controller = None
 
-        # World and robot
         self.world = None
-        self.franka = None
+        self.cobot = None
         self.gripper = None
         self.container = None
 
@@ -789,12 +761,11 @@ class FrankaRRTInteractive:
 
     def build_ui(self):
         """Build the UI window with buttons"""
-        self.window = ui.Window("Franka RRT Control", width=450, height=450)
+        self.window = ui.Window("Cobot RRT Control", width=450, height=450)
 
         with self.window.frame:
             with ui.VStack(spacing=10):
-                # Title
-                ui.Label("Franka RRT Pick and Place",
+                ui.Label("Cobot RRT Pick and Place",
                         alignment=ui.Alignment.CENTER,
                         style={"font_size": 18})
 
@@ -858,7 +829,7 @@ class FrankaRRTInteractive:
                 with ui.CollapsableFrame("Instructions", height=0):
                     with ui.VStack(spacing=3):
                         ui.Label("Instructions:", alignment=ui.Alignment.LEFT)
-                        ui.Label("1. Load Scene - Creates Franka, Container, Ground",
+                        ui.Label("1. Load Scene - Creates Cobot, Container, Ground",
                                 alignment=ui.Alignment.LEFT, word_wrap=True)
                         ui.Label(f"2. Add Object Stack - Adds pyramid ({self.num_layers} layers: {self.base_layer_count}, {self.base_layer_count-1}, ..., 1)",
                                 alignment=ui.Alignment.LEFT, word_wrap=True)
@@ -905,18 +876,14 @@ class FrankaRRTInteractive:
         print("="*60)
 
         try:
-            # Create scene setup
             self.scene_setup = SceneSetup()
 
-            # Setup complete scene
-            self.world, self.franka, self.gripper, self.container = self.scene_setup.setup_complete_scene()
+            self.world, self.cobot, self.gripper, self.container = self.scene_setup.setup_complete_scene()
 
-            # Create object manager with pyramid configuration
             self.object_manager = ObjectManager(self.world, self.base_layer_count, self.num_layers)
 
-            # Create RRT controller
             container_info = self.scene_setup.get_container_info()
-            self.rrt_controller = RRTController(self.world, self.franka, self.gripper, container_info)
+            self.rrt_controller = RRTController(self.world, self.cobot, self.gripper, container_info)
 
             # Reset performance metrics
             self.step_count = 0
@@ -1064,9 +1031,8 @@ class FrankaRRTInteractive:
                 World.clear_instance()
                 print("World cleared - all prims deleted from stage")
 
-            # Reset all component references
             self.world = None
-            self.franka = None
+            self.cobot = None
             self.gripper = None
             self.container = None
             self.scene_setup = None
@@ -1107,19 +1073,18 @@ def main(base_layer_count=4, num_layers=4):
     Main entry point
 
     Args:
-        base_layer_count: Number of cuboids in bottom layer (default: 4 for 2x2 grid)
+        base_layer_count: Number of objects in bottom layer (default: 4 for 2x2 grid)
         num_layers: Total number of layers (default: 4 for layers of 4,3,2,1)
     """
     print("\n" + "="*60)
-    print("Franka RRT Interactive Pick and Place - Standalone")
+    print("Cobot RRT Interactive Pick and Place - Standalone")
     print(f"Pyramid Configuration: {num_layers} layers")
-    print(f"Base layer: {base_layer_count} cuboids")
-    total_cuboids = sum(range(base_layer_count - num_layers + 1, base_layer_count + 1))
-    print(f"Total cuboids: {total_cuboids}")
+    print(f"Base layer: {base_layer_count} objects")
+    total_objects = sum(range(base_layer_count - num_layers + 1, base_layer_count + 1))
+    print(f"Total objects: {total_objects}")
     print("="*60 + "\n")
 
-    # Create and show UI with configuration
-    app = FrankaRRTInteractive(base_layer_count, num_layers)
+    app = CobotRRTInteractive(base_layer_count, num_layers)
     app.build_ui()
 
     print("UI loaded! Use the buttons to control the robot.")

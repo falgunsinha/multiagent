@@ -1,7 +1,3 @@
-"""
-Object Manager Module for RRT Pick and Place
-Handles creation and management of dynamic cuboids in pyramid stacks
-"""
 
 import numpy as np
 import time

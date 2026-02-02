@@ -1,8 +1,3 @@
-"""
-Interactive Franka RRT Pick and Place with UI Buttons
-Executable from VS Code without SimulationApp
-"""
-
 import asyncio
 import time
 import sys
@@ -12,37 +7,29 @@ import omni.ui as ui
 from omni.kit.async_engine import run_coroutine
 import omni.timeline
 
-# Add the RRT directory to Python path so we can import our modules
-# Try multiple methods to find the script directory
 script_dir = None
 
-# Method 1: Try __file__ if available
 try:
     if '__file__' in globals():
         script_dir = Path(__file__).parent.resolve()
 except:
     pass
 
-# Method 2: Try using the workspace path
 if script_dir is None:
     try:
-        script_dir = Path(r"C:\isaacsim\cobotproject\scripts\RRT")
+        cwd = Path(os.getcwd())
+        for parent in [cwd] + list(cwd.parents):
+            if parent.name == "multiagent":
+                script_dir = parent / "scripts" / "RRT"
+                break
     except:
         pass
 
-# Method 3: Try current working directory + relative path
 if script_dir is None:
-    try:
-        script_dir = Path(os.getcwd()) / "cobotproject" / "scripts" / "RRT"
-        if not script_dir.exists():
-            script_dir = None
-    except:
-        pass
+    script_dir = Path.cwd() / "scripts" / "RRT"
 
-# Add to sys.path if found
 if script_dir and str(script_dir) not in sys.path:
     sys.path.insert(0, str(script_dir))
-    print(f"Added to Python path: {script_dir}")
 
 # Import our modules
 from scene_setup import SceneSetup
@@ -50,7 +37,7 @@ from object_manager import ObjectManager
 from rrt_controller import RRTController
 
 
-class FrankaRRTInteractive:
+class CobotRRTInteractive:
     """Main class for interactive RRT pick and place with UI"""
 
     def __init__(self, base_layer_count=4, num_layers=4):
@@ -58,21 +45,18 @@ class FrankaRRTInteractive:
         Initialize interactive RRT system
 
         Args:
-            base_layer_count: Number of cuboids in bottom layer of pyramid (e.g., 4 for 2x2 grid)
-            num_layers: Total number of layers in pyramid (e.g., 4 for layers of 4,3,2,1)
+            base_layer_count: Number of objects in bottom layer of pyramid
+            num_layers: Total number of layers in pyramid
         """
-        # Pyramid configuration
         self.base_layer_count = base_layer_count
         self.num_layers = num_layers
 
-        # Components
         self.scene_setup = None
         self.object_manager = None
         self.rrt_controller = None
 
-        # World and scene objects
         self.world = None
-        self.franka = None
+        self.cobot = None
         self.gripper = None
         self.container = None
 
@@ -102,12 +86,11 @@ class FrankaRRTInteractive:
         
     def build_ui(self):
         """Build the UI window with buttons"""
-        self.window = ui.Window("Franka RRT Pick & Place", width=450, height=400)
+        self.window = ui.Window("Cobot RRT Pick & Place", width=450, height=400)
 
         with self.window.frame:
             with ui.VStack(spacing=10, height=0):
-                # Title
-                ui.Label("Franka RRT Pick and Place Controller",
+                ui.Label("Cobot RRT Pick and Place Controller",
                         alignment=ui.Alignment.CENTER,
                         style={"font_size": 18})
 
@@ -191,9 +174,8 @@ class FrankaRRTInteractive:
                 
                 ui.Spacer(height=20)
                 
-                # Info label
                 ui.Label("Instructions:", alignment=ui.Alignment.LEFT)
-                ui.Label("1. Load Scene - Creates Franka, Container, Ground",
+                ui.Label("1. Load Scene - Creates Cobot, Container, Ground",
                         alignment=ui.Alignment.LEFT, word_wrap=True)
                 ui.Label(f"2. Add Object Stack - Adds pyramid ({self.num_layers} layers: {self.base_layer_count}, {self.base_layer_count-1}, ..., 1)",
                         alignment=ui.Alignment.LEFT, word_wrap=True)
@@ -245,19 +227,15 @@ class FrankaRRTInteractive:
         """Load the scene asynchronously"""
         try:
             self._update_status("Loading scene...")
-            
-            # Create scene setup
-            self.scene_setup = SceneSetup()
-            
-            # Setup complete scene
-            self.world, self.franka, self.gripper, self.container = self.scene_setup.setup_complete_scene()
 
-            # Create object manager with pyramid configuration
+            self.scene_setup = SceneSetup()
+
+            self.world, self.cobot, self.gripper, self.container = self.scene_setup.setup_complete_scene()
+
             self.object_manager = ObjectManager(self.world, self.base_layer_count, self.num_layers)
-            
-            # Create RRT controller
+
             container_info = self.scene_setup.get_container_info()
-            self.rrt_controller = RRTController(self.franka, self.gripper, container_info)
+            self.rrt_controller = RRTController(self.cobot, self.gripper, container_info)
             
             # Setup RRT
             self.rrt_controller.setup_rrt()
@@ -443,15 +421,14 @@ def main(base_layer_count=4, num_layers=4):
         num_layers: Total number of layers (default: 4 for layers of 4,3,2,1)
     """
     print("\n" + "="*60)
-    print("Franka RRT Interactive Pick and Place")
+    print("Cobot RRT Interactive Pick and Place")
     print(f"Pyramid Configuration: {num_layers} layers")
-    print(f"Base layer: {base_layer_count} cuboids")
-    total_cuboids = sum(range(base_layer_count - num_layers + 1, base_layer_count + 1))
-    print(f"Total cuboids: {total_cuboids}")
+    print(f"Base layer: {base_layer_count} objects")
+    total_objects = sum(range(base_layer_count - num_layers + 1, base_layer_count + 1))
+    print(f"Total objects: {total_objects}")
     print("="*60 + "\n")
 
-    # Create and show UI with configuration
-    app = FrankaRRTInteractive(base_layer_count, num_layers)
+    app = CobotRRTInteractive(base_layer_count, num_layers)
     app.build_ui()
 
     print("UI loaded! Use the buttons to control the robot.")

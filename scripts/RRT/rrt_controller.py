@@ -1,8 +1,3 @@
-"""
-RRT Controller Module for Pick and Place
-Handles Lula RRT motion planning and pick/place execution
-"""
-
 import numpy as np
 import os
 from pathlib import Path
