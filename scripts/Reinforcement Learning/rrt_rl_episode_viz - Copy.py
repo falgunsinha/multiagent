@@ -31,12 +31,8 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# Add Catmull-Rom spline path
-catmull_rom_path = os.path.join(project_root, 'PythonRobotics', 'PathPlanning', 'Catmull_RomSplinePath')
-if catmull_rom_path not in sys.path:
-    sys.path.insert(0, catmull_rom_path)
-
-from catmull_rom_spline_path import catmull_rom_spline
+# Import Catmull-Rom spline from local utils
+from src.utils.catmull_rom_spline_path import catmull_rom_spline
 
 from src.rl.object_selection_env_rrt import ObjectSelectionEnvRRT
 from stable_baselines3 import PPO

@@ -1,14 +1,16 @@
 """
 Path estimation algorithms for RL training.
-Provides A* path length estimation for more accurate reward calculation.
+Provides A* and RRT path length estimation for more accurate reward calculation.
 
-This implementation is adapted from PythonRobotics A* implementation:
-C:/isaacsim/cobotproject/PythonRobotics/PathPlanning/AStar/a_star.py
+This implementation is adapted from PythonRobotics:
+- A* algorithm: https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/AStar
+- RRT algorithm: https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/RRT
 
 Key adaptations for RL environment:
 1. Adapted for grid-based pathfinding (discrete grid cells)
 2. Goal cell is always expandable (pick-and-place exception)
 3. Returns path length for reward calculation
+4. Self-contained implementation (no external dependencies on PythonRobotics)
 """
 
 import numpy as np
@@ -42,7 +44,7 @@ class AStarPathEstimator:
     A* path estimator for grid-based environments (adapted from PythonRobotics).
     Estimates path length considering obstacles.
 
-    Based on: C:/isaacsim/cobotproject/PythonRobotics/PathPlanning/AStar/a_star.py
+    Adapted from: https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/AStar
     """
 
     def __init__(self, grid_size: int = 6, cell_size: float = 0.26):
@@ -379,7 +381,7 @@ class RRTPathEstimator:
     RRT path estimator for grid-based environments (adapted from PythonRobotics).
     Estimates path length considering obstacles using RRT algorithm.
 
-    Based on: C:/isaacsim/cobotproject/PythonRobotics/PathPlanning/RRT/rrt.py
+    Adapted from: https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning/RRT
     """
 
     class Node:
