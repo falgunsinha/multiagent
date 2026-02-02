@@ -1,8 +1,0 @@
-names:
-  0: cube
-  1: cylinder
-  2: container
-  3: obstacle
-path: C:\isaacsim\cobotproject\datasets\geometric_shapes_yolo
-train: train/images
-val: test/images
