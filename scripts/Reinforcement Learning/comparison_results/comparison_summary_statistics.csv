@@ -1,8 +1,0 @@
-Metric,GAT-CVD,MASAC
-Final Mean Reward,-77.888426,-134.91948034627137
-Final Success Rate (%),87.0,84.99999999999999
-Final Episode Length,18.0,9.0
-Episodes to 80% Success,2.0,15.0
-Episodes to 90% Success,3.0,
-Timesteps to 80% Success,9.0,414.0
-Timesteps to 90% Success,18.0,
