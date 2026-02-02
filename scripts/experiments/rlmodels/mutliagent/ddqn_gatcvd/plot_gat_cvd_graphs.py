@@ -11,8 +11,8 @@ import seaborn as sns
 from scipy.interpolate import make_interp_spline
 
 # Load both seeds
-seed_42_csv = Path("cobotproject/scripts/experiments/rlmodels/mutliagent/ddqn_gatcvd/gat_cvd_test_results/discrete/seed_42/episode_results.csv")
-seed_123_csv = Path("cobotproject/scripts/experiments/rlmodels/mutliagent/ddqn_gatcvd/gat_cvd_test_results/discrete/seed_123/episode_results.csv")
+seed_42_csv = Path("multiagent/scripts/experiments/rlmodels/mutliagent/ddqn_gatcvd/gat_cvd_test_results/discrete/seed_42/episode_results.csv")
+seed_123_csv = Path("multiagent/scripts/experiments/rlmodels/mutliagent/ddqn_gatcvd/gat_cvd_test_results/discrete/seed_123/episode_results.csv")
 
 df_42 = pd.read_csv(seed_42_csv)
 df_123 = pd.read_csv(seed_123_csv)
