@@ -31,7 +31,7 @@ if script_dir is None:
 if script_dir and str(script_dir) not in sys.path:
     sys.path.insert(0, str(script_dir))
 
-# Import our modules
+# Import local modules
 from scene_setup import SceneSetup
 from object_manager import ObjectManager
 from rrt_controller import RRTController
@@ -435,11 +435,6 @@ def main(base_layer_count=4, num_layers=4):
     print("="*60 + "\n")
 
 
-# Run the application
 if __name__ == "__main__":
-    # You can customize the pyramid configuration here:
-    # main(base_layer_count=4, num_layers=4)  # Default: 4,3,2,1 pyramid
-    # main(base_layer_count=5, num_layers=5)  # 5,4,3,2,1 pyramid
-    # main(base_layer_count=3, num_layers=3)  # 3,2,1 pyramid
     main()
 
