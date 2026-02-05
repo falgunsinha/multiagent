@@ -1,21 +1,14 @@
-
 from isaacsim.util.debug_draw import _debug_draw
 
 
 class VisualGrid:
     """
     Creates visual grid lines on the ground plane in Isaac Sim using debug draw.
-
-    The grid is created using debug draw lines which are lightweight and
-    don't create USD prims.
     """
 
     def __init__(self, z_height=0.001):
         """
-        Initialize the VisualGrid.
-
-        Args:
-            z_height: Height at which to draw the grid (default: 0.001 for ground level, use 0.75 for table level)
+        Initialize the VisualGrid
         """
         self.draw_interface = _debug_draw.acquire_debug_draw_interface()
         self.line_height = z_height  # Height above ground/table to avoid z-fighting
@@ -25,23 +18,11 @@ class VisualGrid:
     def create_grid(self, start_x, start_y, grid_extent_x, grid_extent_y, cell_size, num_rows, num_cols):
         """
         Create visual grid lines on the ground plane using debug draw.
-
-        Args:
-            start_x: Starting X position of grid (bottom-left corner)
-            start_y: Starting Y position of grid (bottom-left corner)
-            grid_extent_x: Total extent in X direction (meters)
-            grid_extent_y: Total extent in Y direction (meters)
-            cell_size: Size of each grid cell (meters)
-            num_rows: Number of rows in the grid
-            num_cols: Number of columns in the grid
-
-        Returns:
-            int: Total number of grid lines created
         """
         line_count = 0
         z = self.line_height
 
-        # Collect all line start and end points
+     
         start_points = []
         end_points = []
         colors = []
@@ -86,19 +67,6 @@ class VisualGrid:
 def create_visual_grid(start_x, start_y, grid_extent_x, grid_extent_y, cell_size, num_rows, num_cols, z_height=0.001):
     """
     Convenience function to create a visual grid using debug draw.
-
-    Args:
-        start_x: Starting X position of grid (bottom-left corner)
-        start_y: Starting Y position of grid (bottom-left corner)
-        grid_extent_x: Total extent in X direction (meters)
-        grid_extent_y: Total extent in Y direction (meters)
-        cell_size: Size of each grid cell (meters)
-        num_rows: Number of rows in the grid
-        num_cols: Number of columns in the grid
-        z_height: Height at which to draw the grid (default: 0.001 for ground level, use 0.75 for table level)
-
-    Returns:
-        VisualGrid: The created VisualGrid instance
     """
     grid = VisualGrid(z_height=z_height)
     grid.create_grid(start_x, start_y, grid_extent_x, grid_extent_y, cell_size, num_rows, num_cols)
