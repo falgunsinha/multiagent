@@ -1,8 +1,3 @@
-"""
-Extract q_overestimation data from wandb offline runs and create visualization.
-Based on solution from: https://github.com/wandb/wandb/issues/1768
-"""
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,8 +6,6 @@ import json
 
 from wandb.proto import wandb_internal_pb2
 from wandb.sdk.internal import datastore
-
-# Define the runs we want to analyze
 runs_to_analyze = {
     'A* Grid 4 Objects 9': 'run-20251220_021934-saemm4ho',
     'RRT Viz Grid 4 Objects 9': 'run-20251220_134743-dbi680zb',
@@ -36,58 +29,43 @@ def extract_history_from_wandb(wandb_file_path, debug=False):
 
     while True:
         try:
-            # Use scan_data() instead of scan_record() to avoid checksum issues
             data = ds.scan_data()
             if data is None:
                 break
-
-            # Parse the protobuf record
             pb = wandb_internal_pb2.Record()
             pb.ParseFromString(data)
 
             record_count += 1
-
-            # Check if this is a history record
             record_type = pb.WhichOneof("record_type")
             if record_type == "history":
                 history_count += 1
-
-                # Extract metrics from this history record
                 metrics = {}
 
                 for item in pb.history.item:
-                    # The key is stored in nested_key field (repeated field)
                     if item.nested_key:
                         key = item.nested_key[0]  # Get first element of nested_key
                     else:
                         key = item.key
 
                     all_keys_seen.add(key)
-
-                    # Store all metrics
                     try:
                         value = json.loads(item.value_json)
                         metrics[key] = value
                     except:
-                        # If not JSON, try to parse as number
                         try:
                             metrics[key] = float(item.value_json)
                         except:
                             metrics[key] = item.value_json
 
-                # Debug: print keys for first few history records
                 if debug and history_count <= 3:
                     print(f"    History record {history_count} keys: {list(metrics.keys())[:15]}")
 
-                # Add all history records (we'll filter later if needed)
                 history_data.append(metrics)
 
-            # Progress indicator
             if record_count % 50000 == 0:
                 print(f"    Processed {record_count} records, {history_count} history records")
 
         except Exception as e:
-            # End of file or error
             if debug:
                 print(f"    Error at record {record_count}: {e}")
             break
@@ -98,7 +76,6 @@ def extract_history_from_wandb(wandb_file_path, debug=False):
     if debug:
         print(f"  Keys: {sorted(all_keys_seen)}")
 
-    # Check if q_overestimation exists
     if 'ddqn/q_overestimation' in all_keys_seen:
         print(f"  ✓ Found 'ddqn/q_overestimation' key")
         # Filter to only records with q_overestimation
@@ -110,7 +87,6 @@ def extract_history_from_wandb(wandb_file_path, debug=False):
         print(f"  Available DDQN keys: {[k for k in sorted(all_keys_seen) if 'ddqn' in k.lower() or 'q_' in k.lower()]}")
         return None
 
-# Extract data from all runs
 print("Extracting data from wandb runs...")
 print("="*80)
 
@@ -142,11 +118,8 @@ print("Creating visualization...")
 print("="*80)
 
 if all_data:
-    # Create the plot with style similar to the reference image
     plt.figure(figsize=(10, 6))
     plt.style.use('seaborn-v0_8-darkgrid')
-
-    # Colors for each method
     colors = {
         'A* Grid 4 Objects 9': '#FF6B6B',  # Red
         'RRT Viz Grid 4 Objects 9': '#4ECDC4',  # Teal
@@ -175,12 +148,8 @@ if all_data:
             return smoothed
 
         y_smooth = smooth(y, weight=0.85)
-
-        # Plot the smoothed line
         color = colors.get(name, '#888888')
         plt.plot(x, y_smooth, label=name, color=color, linewidth=2.5, alpha=0.9)
-
-        # Add semi-transparent raw data as background
         plt.plot(x, y, color=color, alpha=0.15, linewidth=0.8)
 
     plt.xlabel('Timesteps', fontsize=13, fontweight='bold')
@@ -189,19 +158,13 @@ if all_data:
               fontsize=15, fontweight='bold', pad=15)
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
-
-    # Set background color
     ax = plt.gca()
     ax.set_facecolor('#F8F9FA')
 
     plt.tight_layout()
-
-    # Save the plot
     output_file = wandb_dir.parent / 'q_overestimation_comparison.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"\nPlot saved to: {output_file}")
-
-    # Show the plot
     plt.show()
 
     print("\nVisualization complete!")
