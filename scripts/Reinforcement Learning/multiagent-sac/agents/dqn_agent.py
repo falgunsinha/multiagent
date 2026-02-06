@@ -1,6 +1,4 @@
-""" Packaged MASAC"""
 from typing import Dict, List, Tuple
-
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -153,7 +151,6 @@ class DQNAgent:
 
 
     def test(self):
-        """ Test agent """
         self.is_test = True
         env_info = self.env.reset(train_mode=False)[self.brain_name]
         state = env_info.vector_observations[0]
@@ -172,7 +169,6 @@ class DQNAgent:
 
 
     def _compute_dqn_loss(self, samples: Dict[str, np.ndarray], gamma: float=0.99) -> torch.Tensor:
-        """ Compute and return DQN loss"""
         gamma = self.gamma
         device = self.device
         state = torch.FloatTensor(samples["obs"]).to(device)
@@ -192,7 +188,6 @@ class DQNAgent:
 
 
     def _target_hard_update(self):
-        """ update target network """
         self.dqn_target.load_state_dict(self.dqn.state_dict())
 
     def _plot(
