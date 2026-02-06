@@ -1,6 +1,4 @@
 import pandas as pd
-
-# Check training CSV
 print("=" * 60)
 print("TRAINING CSV ANALYSIS")
 print("=" * 60)
@@ -12,8 +10,6 @@ df_at_30k = df_train[df_train['step'] <= 30000]
 print(f"Rows at step <= 30000: {len(df_at_30k)}")
 print(f"Episode at step 30000: {df_at_30k['episode'].max()}")
 print(f"Rows to REMOVE: {len(df_train) - len(df_at_30k)}")
-
-# Check episodes CSV
 print("\n" + "=" * 60)
 print("EPISODES CSV ANALYSIS")
 print("=" * 60)
