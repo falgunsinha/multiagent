@@ -1,11 +1,3 @@
-"""
-Train Double DQN Agent with RRT Path Planning in Isaac Sim
-Uses Double DQN algorithm with actual Isaac Sim RRT for training.
-
-Usage:
-    C:\isaacsim\python.bat train_rrt_isaacsim_ddqn.py --timesteps 50000 --grid_size 4 --num_cubes 9
-"""
-
 import argparse
 import sys
 from pathlib import Path
@@ -49,7 +41,7 @@ parser.add_argument("--resume", type=str, default=None,
                    help="Path to checkpoint to resume from (e.g., models/checkpoint_step_25000.pt)")
 args = parser.parse_args()
 
-# Create SimulationApp BEFORE importing any Isaac Sim modules
+
 try:
     from isaacsim import SimulationApp
 except ImportError:
@@ -64,8 +56,6 @@ from datetime import datetime
 import json
 import omni.timeline
 import omni.usd
-
-# Isaac Sim imports
 from isaacsim.core.api import World
 from isaacsim.core.prims import SingleXFormPrim
 from isaacsim.core.utils.stage import add_reference_to_stage
@@ -77,7 +67,6 @@ from isaacsim.robot_motion.motion_generation.lula import RRT
 from isaacsim.robot_motion.motion_generation import ArticulationKinematicsSolver, LulaKinematicsSolver, PathPlannerVisualizer
 from pxr import UsdGeom, UsdPhysics
 
-# Add project root to path
 project_root = Path(r"C:\isaacsim\cobotproject")
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -106,7 +95,7 @@ def clear_console():
 class FrankaRRTTrainer:
     """
     Franka controller for RRT-based Double DQN training.
-    Simplified version focused on training.
+
     """
 
     def __init__(self, num_cubes=9, training_grid_size=4):
@@ -130,13 +119,8 @@ class FrankaRRTTrainer:
         """Setup Isaac Sim scene with Franka and cubes"""
         print("[TRAINER] Setting up scene...")
 
-        # Create world
         self.world = World(stage_units_in_meters=1.0)
-
-        # Add ground plane
         self.world.scene.add_default_ground_plane()
-
-        # Add Franka robot USD to stage
         assets_root_path = get_assets_root_path()
         franka_prim_path = "/World/Franka"
 
@@ -145,7 +129,7 @@ class FrankaRRTTrainer:
         robot_prim.GetVariantSet("Gripper").SetVariantSelection("AlternateFinger")
         robot_prim.GetVariantSet("Mesh").SetVariantSelection("Quality")
 
-        # Create gripper
+      
         self.gripper = ParallelGripper(
             end_effector_prim_path=f"{franka_prim_path}/panda_rightfinger",
             joint_prim_names=["panda_finger_joint1", "panda_finger_joint2"],
@@ -154,7 +138,7 @@ class FrankaRRTTrainer:
             action_deltas=np.array([0.01, 0.01])
         )
 
-        # Create Franka manipulator
+      
         self.franka = self.world.scene.add(
             SingleManipulator(
                 prim_path=franka_prim_path,
@@ -166,22 +150,20 @@ class FrankaRRTTrainer:
             )
         )
 
-        # Initialize RRT planner
+     
         print("[TRAINER] Initializing RRT planner...")
         self._setup_rrt_planner()
 
-        # Add container
+     
         print("[TRAINER] Adding container...")
         self._setup_container()
 
-        # Spawn cubes
+     
         self._spawn_cubes()
 
-        # Create random obstacles
+      
         print("[TRAINER] Creating random obstacles in empty cells...")
         self._create_random_obstacles()
-
-        # Reset world
         self.world.reset()
 
         print("[TRAINER] Scene setup complete")
@@ -395,11 +377,6 @@ class FrankaRRTTrainer:
     def randomize_cube_positions(self):
         """
         Re-randomize cube positions without recreating them.
-        Called at the start of each episode to provide diverse training scenarios.
-
-        IMPROVED: Now shuffles cube-to-cell assignment to eliminate position bias.
-        This ensures each cube has equal probability of being in any position,
-        preventing spurious correlations like "action 8 is always harder".
         """
         cube_size = 0.0515
         cube_spacing = 0.13 if self.training_grid_size > 3 else 0.15
@@ -410,17 +387,10 @@ class FrankaRRTTrainer:
         grid_extent_y = (self.training_grid_size - 1) * cube_spacing
         start_x = grid_center_x - (grid_extent_x / 2.0)
         start_y = grid_center_y - (grid_extent_y / 2.0)
-
-        # Randomly select grid cells for cubes
         total_cells = self.training_grid_size * self.training_grid_size
         selected_indices = np.random.choice(total_cells, size=self.num_cubes, replace=False)
-
-        # IMPROVED: Shuffle cube indices to randomize cube-to-cell assignment
-        # This prevents bias where Cube_1 always goes to lowest cell, Cube_9 to highest
         cube_indices = list(range(len(self.cubes)))
         np.random.shuffle(cube_indices)
-
-        # Build list of positions for selected cells
         positions = []
         for cell_idx in sorted(selected_indices):
             row = cell_idx // self.training_grid_size
@@ -434,8 +404,6 @@ class FrankaRRTTrainer:
 
             position = np.array([base_x + offset_x, base_y + offset_y, cube_size / 2.0])
             positions.append(position)
-
-        # Assign positions to cubes in shuffled order
         for i, cube_idx in enumerate(cube_indices):
             cube, cube_name = self.cubes[cube_idx]
             cube.set_world_pose(position=positions[i])
@@ -446,9 +414,8 @@ class FrankaRRTTrainer:
     def randomize_obstacle_positions(self):
         """
         Re-randomize obstacle positions without recreating them.
-        Called at the start of each episode after cubes are randomized.
         """
-        # Determine number of obstacles (same logic as _create_random_obstacles)
+     
         num_obstacles_map = {
             3: 1,
             4: 2,
@@ -456,14 +423,12 @@ class FrankaRRTTrainer:
         }
         num_obstacles = num_obstacles_map.get(self.training_grid_size, max(1, self.training_grid_size // 3))
 
-        # Get cube cells
         cube_cells = set()
         for i in range(self.num_cubes):
             cube_pos = self.cube_positions[i]
             grid_col, grid_row = self._world_to_grid(cube_pos[:2])
             cube_cells.add((grid_col, grid_row))
 
-        # Find empty cells
         empty_cells = []
         for grid_x in range(self.training_grid_size):
             for grid_y in range(self.training_grid_size):
@@ -475,12 +440,9 @@ class FrankaRRTTrainer:
 
         if num_obstacles == 0 or len(self.obstacles) == 0:
             return
-
-        # Randomly select cells for obstacles
         np.random.shuffle(empty_cells)
         selected_cells = empty_cells[:num_obstacles]
 
-        # Update obstacle positions
         for idx, (grid_x, grid_y) in enumerate(selected_cells):
             if idx >= len(self.obstacles):
                 break
@@ -488,7 +450,6 @@ class FrankaRRTTrainer:
             world_pos = self._grid_to_world(grid_x, grid_y)
             obs_position = np.array([world_pos[0], world_pos[1], 0.055])
 
-            # Update obstacle position
             self.obstacles[idx].set_world_pose(position=obs_position)
 
         print(f"[TRAINER] Randomized positions for {min(len(selected_cells), len(self.obstacles))} obstacles")
@@ -496,7 +457,6 @@ class FrankaRRTTrainer:
 
 def main():
     """Main training loop"""
-    # Auto-set timesteps based on grid size and num cubes if not specified
     if args.timesteps is None:
         if args.grid_size == 3 and args.num_cubes == 4:
             args.timesteps = 7000  # RRT Isaac Sim needs more steps
@@ -508,7 +468,6 @@ def main():
             args.timesteps = 15000  # Default
         print(f"Auto-set timesteps to {args.timesteps} based on grid_size={args.grid_size}, num_cubes={args.num_cubes}")
 
-    # Initialize W&B if requested
     if args.use_wandb:
         try:
             import wandb
@@ -534,14 +493,13 @@ def main():
                 }
             )
 
-            # Setup charts from separate config file (can be updated without retraining)
             try:
                 import sys
                 sys.path.insert(0, r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script")
                 from wandb_chart_config import setup_wandb_charts
                 setup_wandb_charts()
             except ImportError:
-                # Fallback: define basic metrics if config file not found
+              
                 wandb.define_metric("training/loss", step_metric="global_step")
                 wandb.define_metric("training/epsilon", step_metric="global_step")
                 wandb.define_metric("episode/avg_reward_100", step_metric="global_step")
@@ -567,17 +525,11 @@ def main():
     print(f"Gamma: {args.gamma}")
     print(f"Epsilon: {args.epsilon_start} -> {args.epsilon_end} (decay: {args.epsilon_decay})")
     print("=" * 60)
-
-    # Create trainer
     trainer = FrankaRRTTrainer(
         num_cubes=args.num_cubes,
         training_grid_size=args.grid_size
     )
-
-    # Setup scene
     trainer.setup_scene()
-
-    # Create RL environment
     print("\n[TRAINER] Creating RRT-based RL environment...")
     max_objects = args.grid_size * args.grid_size
 
@@ -594,7 +546,6 @@ def main():
         franka_articulation=trainer.franka
     )
 
-    # Create agent
     state_dim = max_objects * 6
     action_dim = max_objects
 
@@ -615,7 +566,6 @@ def main():
         warmup_steps=args.warmup_steps
     )
 
-    # Resume from checkpoint if specified
     total_steps = 0
     episode = 0
     if args.resume:
@@ -634,10 +584,7 @@ def main():
         print(f"Resuming from step {total_steps}, episode {episode}")
         print(f"Current epsilon: {agent.epsilon:.4f}")
         print(f"{'='*60}\n")
-
-        # Extract run_name from checkpoint path
         checkpoint_name = os.path.basename(args.resume)
-        # Format: ddqn_rrt_isaacsim_grid4_cubes9_20251219_115447_step_25000.pt
         run_name = '_'.join(checkpoint_name.split('_')[:-2])  # Remove _step_XXXXX.pt
     else:
         # Create directories
@@ -648,14 +595,9 @@ def main():
     model_dir = r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models"
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(model_dir, exist_ok=True)
-
-    # Create enhanced log files
     log_file = os.path.join(log_dir, f"{run_name}_training.csv")
     episode_log_file = os.path.join(log_dir, f"{run_name}_episodes.csv")
-
-    # Create or append to log files
     if args.resume:
-        # Append mode - files should already exist
         if not os.path.exists(log_file):
             print(f"WARNING: Training log not found, creating new: {log_file}")
             with open(log_file, 'w') as f:
@@ -665,7 +607,6 @@ def main():
             with open(episode_log_file, 'w') as f:
                 f.write("episode,total_reward,length,success,avg_reward_100,success_rate_100\n")
     else:
-        # Create new log files
         with open(log_file, 'w') as f:
             f.write("step,episode,loss,step_reward,epsilon,q_value,episode_reward,episode_length,avg_reward_100,success_rate\n")
 
@@ -678,8 +619,7 @@ def main():
     print(f"Episode log will be saved to: {episode_log_file}")
     print("=" * 60 + "\n")
 
-    # MEMORY FIX: Use deque with maxlen to prevent unbounded memory growth
-    # Only keep last 1000 episodes in memory (enough for statistics)
+  
     episode_rewards = deque(maxlen=1000)
     episode_lengths = deque(maxlen=1000)
     episode_successes = deque(maxlen=1000)
@@ -691,51 +631,29 @@ def main():
         done = False
 
         while not done and total_steps < args.timesteps:
-            # Get action mask
+          
             action_mask = info.get('action_mask', env.action_masks())
-
-            # Select action
             action = agent.select_action(state, action_mask)
-
-            # Take step
             next_state, reward, terminated, truncated, info = env.step(action)
             done = terminated or truncated
-
-            # Get next action mask
             next_action_mask = info.get('action_mask', env.action_masks())
-
-            # Store transition
             agent.store_transition(state, action, reward, next_state, done, action_mask, next_action_mask)
-
-            # Train
             loss = agent.train_step()
-
-            # Update state
             state = next_state
             episode_reward += reward
             episode_length += 1
             total_steps += 1
-
-            # Calculate metrics for logging
-            # Convert deque to list for slicing (deque doesn't support slicing)
             avg_reward_100 = np.mean(list(episode_rewards)[-100:]) if episode_rewards else 0.0
             success_rate = np.mean(list(episode_successes)[-100:]) if episode_successes else 0.0
-
-            # Enhanced CSV logging (10 metrics)
             with open(log_file, 'a') as f:
                 loss_val = f"{loss:.6f}" if loss is not None else ""
                 q_val = f"{agent.last_q_value:.6f}"
                 f.write(f"{total_steps},{episode},{loss_val},{reward:.6f},{agent.epsilon:.6f},"
                        f"{q_val},{episode_reward:.6f},{episode_length},{avg_reward_100:.6f},{success_rate:.6f}\n")
-
-            # W&B logging (per-step metrics)
             if args.use_wandb:
                 import wandb
                 wandb.log({
-                    # Step counter (required for custom step metric)
                     "global_step": total_steps,
-
-                    # Basic training metrics
                     "training/loss": loss if loss is not None else 0.0,
                     "train/loss_raw": loss if loss is not None else 0.0,
                     "training/epsilon": agent.epsilon,
@@ -743,25 +661,20 @@ def main():
                     "training/step_reward": reward,
                     "training/episode_reward_running": episode_reward,
                     "training/episode_length_running": episode_length,
-
-                    # Advanced Q-value statistics
                     "train/q_mean": agent.q_mean,
                     "train/q_max": agent.q_max,
                     "train/q_std": agent.q_std,
-
-                    # DDQN overestimation bias tracking
                     "ddqn/q_policy": agent.q_max,
                     "ddqn/q_target": agent.value_estimate,
                     "ddqn/q_overestimation": agent.q_overestimation,
                     "ddqn/value_estimate": agent.value_estimate,
 
-                    # TD error
+                   
                     "train/td_error": agent.td_error
                 })
 
-            # Print progress and clear console periodically
             if total_steps % 1000 == 0:
-                # MEMORY FIX: Clear console every 5000 steps to prevent terminal history buildup
+            
                 if total_steps % 5000 == 0:
                     clear_console()
                     print("=" * 60)
@@ -775,29 +688,21 @@ def main():
                       f"Epsilon: {agent.epsilon:.4f} | "
                       f"Loss: {loss_str}")
 
-            # Save checkpoint
+        
             if total_steps % args.save_freq == 0:
                 checkpoint_path = os.path.join(model_dir, f"{run_name}_step_{total_steps}.pt")
                 agent.save(checkpoint_path)
 
-        # Episode finished
-        # CORRECTED: Success is proportional (cubes_picked / total_cubes), not binary
         episode_success = len(env.objects_picked) / env.num_cubes
         episode_rewards.append(episode_reward)
         episode_lengths.append(episode_length)
         episode_successes.append(episode_success)
-
-        # Calculate episode metrics
-        # Convert deque to list for slicing (deque doesn't support slicing)
         avg_reward_100 = np.mean(list(episode_rewards)[-100:])
         success_rate_100 = np.mean(list(episode_successes)[-100:])
-
-        # Log episode summary
         with open(episode_log_file, 'a') as f:
             f.write(f"{episode},{episode_reward:.6f},{episode_length},{episode_success:.6f},"
                    f"{avg_reward_100:.6f},{success_rate_100:.6f}\n")
 
-        # W&B logging (per-episode metrics)
         if args.use_wandb:
             import wandb
             wandb.log({
@@ -812,17 +717,15 @@ def main():
         agent.episodes += 1
         episode += 1
 
-        # MEMORY FIX: Periodic garbage collection every 100 episodes
         if episode % 100 == 0:
             gc.collect()
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-    # Save final model
     final_path = os.path.join(model_dir, f"{run_name}_final.pt")
     agent.save(final_path)
 
-    # Save metadata
+
     metadata = {
         "method": "rrt_isaacsim",
         "algorithm": "double_dqn",
@@ -862,14 +765,11 @@ def main():
     print(f"Success rate (last 100 ep): {metadata['success_rate_100']:.2%}")
     print("=" * 60)
 
-    # Finish W&B run
     if args.use_wandb:
         import wandb
         wandb.finish()
 
     simulation_app.close()
-
-    # Explicitly exit with success code for batch scripts
     import sys
     sys.exit(0)
 
