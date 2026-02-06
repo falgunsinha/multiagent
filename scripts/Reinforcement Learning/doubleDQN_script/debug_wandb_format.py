@@ -1,7 +1,3 @@
-"""
-Debug script to understand the wandb protobuf format.
-"""
-
 from pathlib import Path
 from wandb.proto import wandb_internal_pb2
 from wandb.sdk.internal import datastore
@@ -35,22 +31,15 @@ while record_count < 100:  # Only check first 100 records
         if record_type == "history":
             history_count += 1
             print(f"\n--- History Record #{history_count} (Record #{record_count}) ---")
-            
-            # Check the history object structure
             history = pb.history
             print(f"Number of items: {len(history.item)}")
-            
-            # Print first few items in detail
             for i, item in enumerate(history.item[:10]):
                 print(f"\nItem {i}:")
                 print(f"  key: '{item.key}'")
                 print(f"  value_json: '{item.value_json}'")
-
-                # Check for nested_key (it's a repeated field, not a singular field)
                 if item.nested_key:
                     print(f"  nested_key: {list(item.nested_key)}")
 
-                # Check for other value types
                 fields = ['value_int', 'value_float', 'value_str', 'value_bool']
                 for field in fields:
                     try:
