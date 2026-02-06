@@ -1,4 +1,3 @@
-""" Packaged MASAC """
 import argparse
 import torch
 import numpy as np
