@@ -1,16 +1,7 @@
-"""
-Train GAT+CVD Multi-Agent System with Isaac Sim RRT
-Combines DDQN (object selection) + MASAC (spatial manipulation) with GAT encoder and CVD.
-
-Usage:
-    C:\isaacsim\python.bat train_gat_cvd_isaacsim.py --timesteps 50000 --grid_size 4 --num_cubes 9
-"""
-
 import argparse
 import sys
 from pathlib import Path
 
-# Parse command-line arguments BEFORE importing Isaac Sim
 parser = argparse.ArgumentParser(description="Train GAT+CVD multi-agent system with Isaac Sim RRT")
 parser.add_argument("--timesteps", type=int, default=None,
                    help="Total training timesteps (auto-set based on grid/cubes if not specified)")
@@ -83,8 +74,6 @@ from gat_cvd.graph_utils import build_graph, compute_edge_features
 
 from src.rl.object_selection_env_rrt import ObjectSelectionEnvRRT
 from src.rl.doubleDQN import DoubleDQNAgent
-
-# Add MAPPO and MASAC paths for TwoAgentEnv
 mappo_path = Path(r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MAPPO")
 if str(mappo_path) not in sys.path:
     sys.path.insert(0, str(mappo_path))
@@ -108,7 +97,6 @@ def clear_console():
 class FrankaRRTTrainer:
     """
     Franka controller for RRT-based GAT+CVD training.
-    Reuses the same setup as DDQN training.
     """
 
     def __init__(self, num_cubes=9, training_grid_size=4):
@@ -132,13 +120,8 @@ class FrankaRRTTrainer:
         """Setup Isaac Sim scene with Franka and cubes"""
         print("[TRAINER] Setting up scene...")
 
-        # Create world
         self.world = World(stage_units_in_meters=1.0)
-
-        # Add ground plane
         self.world.scene.add_default_ground_plane()
-
-        # Add Franka robot USD to stage
         assets_root_path = get_assets_root_path()
         franka_prim_path = "/World/Franka"
 
@@ -146,8 +129,6 @@ class FrankaRRTTrainer:
         robot_prim = add_reference_to_stage(usd_path=franka_usd_path, prim_path=franka_prim_path)
         robot_prim.GetVariantSet("Gripper").SetVariantSelection("AlternateFinger")
         robot_prim.GetVariantSet("Mesh").SetVariantSelection("Quality")
-
-        # Create gripper
         self.gripper = ParallelGripper(
             end_effector_prim_path=f"{franka_prim_path}/panda_rightfinger",
             joint_prim_names=["panda_finger_joint1", "panda_finger_joint2"],
@@ -155,8 +136,6 @@ class FrankaRRTTrainer:
             joint_closed_positions=np.array([0.0, 0.0]),
             action_deltas=np.array([0.01, 0.01])
         )
-
-        # Create Franka manipulator
         self.franka = self.world.scene.add(
             SingleManipulator(
                 prim_path=franka_prim_path,
@@ -167,23 +146,18 @@ class FrankaRRTTrainer:
                 orientation=np.array([1.0, 0.0, 0.0, 0.0])
             )
         )
-
-        # Initialize RRT planner
         print("[TRAINER] Initializing RRT planner...")
         self._setup_rrt_planner()
 
-        # Add container
         print("[TRAINER] Adding container...")
         self._setup_container()
 
-        # Spawn cubes
+   
         self._spawn_cubes()
-
-        # Create random obstacles
         print("[TRAINER] Creating random obstacles in empty cells...")
         self._create_random_obstacles()
 
-        # Reset world
+    
         self.world.reset()
 
         print("[TRAINER] Scene setup complete")
@@ -482,7 +456,6 @@ class FrankaRRTTrainer:
 
 def main():
     """Main training loop"""
-    # Auto-set timesteps based on grid size and num cubes if not specified
     if args.timesteps is None:
         if args.grid_size == 3 and args.num_cubes == 4:
             args.timesteps = 50000  # GAT+CVD with reshuffling needs more steps
@@ -494,15 +467,12 @@ def main():
             args.timesteps = 100000  # Default
         print(f"Auto-set timesteps to {args.timesteps} based on grid_size={args.grid_size}, num_cubes={args.num_cubes}")
 
-    # Load configuration
     config_path = os.path.join(os.path.dirname(__file__), args.config)
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
 
-    # Override config with command-line arguments
     config['device'] = args.device
 
-    # Initialize W&B if requested
     if args.use_wandb:
         try:
             import wandb
@@ -536,16 +506,13 @@ def main():
     print(f"Device: {args.device}")
     print("=" * 60)
 
-    # Create trainer
     trainer = FrankaRRTTrainer(
         num_cubes=args.num_cubes,
         training_grid_size=args.grid_size
     )
 
-    # Setup scene
     trainer.setup_scene()
 
-    # Create base RL environment
     print("\n[TRAINER] Creating RRT-based RL environment...")
     max_objects = args.grid_size * args.grid_size
 
@@ -562,14 +529,11 @@ def main():
         franka_articulation=trainer.franka
     )
 
-    # Update config with environment-specific parameters
     config['node_dim'] = 7  # [x, y, z, is_robot, is_obstacle, is_target, object_id]
     config['edge_dim'] = 3  # [distance, reachability, blocking_score]
     config['n_actions_ddqn'] = max_objects
-    # Reshuffling action space: num_cubes * grid_size * grid_size
     config['n_actions_masac'] = args.num_cubes * args.grid_size * args.grid_size
 
-    # Create GAT+CVD agent (includes DDQN with GAT encoder)
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
     agent = GATCVDAgent(config, device=device)
 
@@ -579,8 +543,6 @@ def main():
     print(f"  - Device: {device}")
     print(f"  - Training from scratch (no pretrained DDQN)")
 
-    # Create a wrapper class that makes GATCVDAgent compatible with TwoAgentEnv
-    # TwoAgentEnv expects a DDQN agent with select_action() method
     class DDQNAgentWrapper:
         """Wrapper to make GATCVDAgent's DDQN component compatible with TwoAgentEnv"""
         def __init__(self, gat_cvd_agent, device):
@@ -607,7 +569,7 @@ def main():
                 device=self.device
             )
 
-            # Use GATCVDAgent's DDQN to select action
+        
             action, _ = self.gat_cvd_agent.select_actions(
                 graph,
                 epsilon_ddqn=self.epsilon,
@@ -616,11 +578,11 @@ def main():
             )
             return action
 
-    # Create DDQN wrapper for TwoAgentEnv
-    ddqn_wrapper = DDQNAgentWrapper(agent, device)
-    print(f"✅ Created DDQN wrapper for TwoAgentEnv (uses GAT+CVD's DDQN)")
 
-    # Create TwoAgentEnv wrapper for reshuffling
+    ddqn_wrapper = DDQNAgentWrapper(agent, device)
+    print(f" Created DDQN wrapper for TwoAgentEnv (uses GAT+CVD's DDQN)")
+
+
     print("\n[TRAINER] Creating TwoAgentEnv wrapper for reshuffling...")
     env = TwoAgentEnv(
         base_env=base_env,
@@ -633,7 +595,6 @@ def main():
         verbose=False
     )
 
-    # Configure reshuffling thresholds for training
     print("[TRAINER] Configuring reshuffling thresholds...")
     env.reshuffle_decision.min_reachable_distance = 0.30
     env.reshuffle_decision.max_reachable_distance = 0.90
@@ -645,9 +606,8 @@ def main():
     env.reshuffle_decision.batch_reshuffle_count = 2
     print("[TRAINER] Reshuffling thresholds configured!")
 
-    print(f"✅ TwoAgentEnv created with reshuffling support!")
+    print(f" TwoAgentEnv created with reshuffling support!")
 
-    # Resume from checkpoint if specified
     total_steps = 0
     episode = 1  # Start from episode 1, not 0
     if args.resume:
@@ -672,13 +632,10 @@ def main():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         run_name = f"gat_cvd_isaacsim_grid{args.grid_size}_cubes{args.num_cubes}_{timestamp}"
 
-    # Create directories
     log_dir = r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MARL\src\gat_cvd\logs"
     model_dir = r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\MARL\src\gat_cvd\models"
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(model_dir, exist_ok=True)
-
-    # Create log files
     log_file = os.path.join(log_dir, f"{run_name}_training.csv")
     episode_log_file = os.path.join(log_dir, f"{run_name}_episodes.csv")
 
@@ -704,12 +661,10 @@ def main():
     print(f"Episode log will be saved to: {episode_log_file}")
     print("=" * 60 + "\n")
 
-    # Memory management
+  
     episode_rewards = deque(maxlen=1000)
     episode_lengths = deque(maxlen=1000)
     episode_successes = deque(maxlen=1000)
-
-    # Epsilon schedules
     epsilon_ddqn = config['training']['epsilon_start_ddqn']
     epsilon_masac = config['training']['epsilon_start_masac']
     epsilon_end_ddqn = config['training']['epsilon_end_ddqn']
@@ -729,13 +684,10 @@ def main():
         done = False
 
         while not done and total_steps < args.timesteps:
-            # Get robot and object positions from trainer
             robot_pos, _ = trainer.franka.get_world_pose()
             robot_positions = [robot_pos]
             object_positions = trainer.get_cube_positions()
             obstacle_positions = trainer.get_obstacle_positions()
-
-            # Build graph from current state
             graph = build_graph(
                 obs=state,
                 robot_positions=robot_positions,
@@ -745,18 +697,13 @@ def main():
                 device=device
             )
 
-            # Get action mask for DDQN (object selection)
-            # TwoAgentEnv uses base_env's action_masks for DDQN
             action_mask = info.get('action_mask', env.base_env.action_masks())
-
-            # Calculate valid cubes for MASAC action masking (reshuffling)
             valid_cubes = [
                 i for i in range(args.num_cubes)
                 if i not in env.base_env.objects_picked
                 and env.reshuffle_count_per_cube.get(i, 0) < 2
             ]
 
-            # Select actions from both agents
             action_ddqn, action_masac = agent.select_actions(
                 graph,
                 epsilon_ddqn=epsilon_ddqn,
@@ -764,37 +711,31 @@ def main():
                 action_mask=action_mask
             )
 
-            # Get Q-value for selected DDQN action (for logging)
             with torch.no_grad():
                 q_values = agent.ddqn_policy(graph)  # DQNNetworkGAT expects graph object
                 q_value_selected = q_values[0, action_ddqn].item()
                 episode_q_values.append(q_value_selected)
 
-            # Update epsilon for DDQN wrapper (so TwoAgentEnv uses current epsilon)
             ddqn_wrapper.epsilon = epsilon_ddqn
 
-            # TwoAgentEnv.step() takes MASAC action (reshuffling)
-            # It internally uses DDQN agent to select target cube and execute pick
             next_state, reward, terminated, truncated, info = env.step(action_masac)
             done = terminated or truncated
 
-            # Extract separate rewards from info
+        
             reward_agent1 = info.get('pick_reward', 0.0)  # Agent 1 (DDQN) reward
             reward_agent2 = info.get('reshuffle_reward', 0.0)  # Agent 2 (MASAC) reward
             cubes_picked_now = info.get('cubes_picked', 0)
 
-            # Track episode metrics
+
             episode_reward_agent1 += reward_agent1
             episode_reward_agent2 += reward_agent2
 
-            # Track reshuffles
+        
             if info.get('reshuffled_this_step', False):
                 episode_reshuffles += 1
-
-            # Get next action mask
             next_action_mask = info.get('action_mask', env.base_env.action_masks())
 
-            # Build next graph
+        
             next_robot_pos, _ = trainer.franka.get_world_pose()
             next_robot_positions = [next_robot_pos]
             next_object_positions = trainer.get_cube_positions()
@@ -809,52 +750,33 @@ def main():
                 device=device
             )
 
-            # Store transition in replay buffer
             agent.store_transition(
                 graph, action_ddqn, action_masac, reward, next_graph, done,
                 action_mask, next_action_mask
             )
 
-            # Train all three components (only if buffer has enough samples)
             loss_ddqn = agent.train_step_ddqn()
             loss_masac_critic, loss_masac_actor, loss_masac_alpha = agent.train_step_masac()
             loss_cvd = agent.train_step_cvd()
-
-            # Combine MASAC losses for logging
             if loss_masac_critic is not None:
                 loss_masac = loss_masac_critic + loss_masac_actor + loss_masac_alpha
             else:
                 loss_masac = None
 
-            # Soft update target networks
             if agent.can_train():
                 agent.soft_update_targets()
 
-            # Update state
             state = next_state
             episode_reward += reward
             episode_length += 1
             total_steps += 1
-
-            # Track actual return for Q-overestimation calculation
             episode_returns.append(reward)
-
-            # Decay epsilon
             epsilon_ddqn = max(epsilon_end_ddqn, epsilon_ddqn * epsilon_decay_ddqn)
             epsilon_masac = max(epsilon_end_masac, epsilon_masac * epsilon_decay_masac)
-
-            # Calculate metrics
             avg_reward_100 = np.mean(list(episode_rewards)[-100:]) if episode_rewards else 0.0
             success_rate = np.mean(list(episode_successes)[-100:]) if episode_successes else 0.0
-
-            # Calculate Q-overestimation (Q-value - actual discounted return)
-            # For simplicity, use immediate reward as approximation
             q_overestimation = q_value_selected - reward if len(episode_q_values) > 0 else 0.0
-
-            # Get current cubes picked
             cubes_picked_current = info.get('cubes_picked', 0)
-
-            # CSV logging
             with open(log_file, 'a') as f:
                 loss_ddqn_val = f"{loss_ddqn:.6f}" if loss_ddqn is not None else ""
                 loss_masac_val = f"{loss_masac:.6f}" if loss_masac is not None else ""
@@ -866,7 +788,6 @@ def main():
                        f"{episode_reward:.6f},{episode_length},{episode_reshuffles},{cubes_picked_current},"
                        f"{avg_reward_100:.6f},{success_rate:.6f}\n")
 
-            # W&B logging
             if args.use_wandb:
                 import wandb
                 wandb.log({
@@ -889,7 +810,6 @@ def main():
                     "training/total_time_saved": env.total_time_saved,
                 })
 
-            # Print progress
             if total_steps % 1000 == 0:
                 if total_steps % 5000 == 0:
                     clear_console()
@@ -908,29 +828,21 @@ def main():
                       f"Loss MASAC: {loss_masac_str} | "
                       f"Loss CVD: {loss_cvd_str}")
 
-            # Save checkpoint
             if total_steps % args.save_freq == 0:
                 checkpoint_path = os.path.join(model_dir, f"{run_name}_step_{total_steps}.pt")
                 agent.save(checkpoint_path)
 
-        # Episode finished
         cubes_picked_final = len(env.base_env.objects_picked)
         episode_success = cubes_picked_final / env.num_cubes
         episode_rewards.append(episode_reward)
         episode_lengths.append(episode_length)
         episode_successes.append(episode_success)
-
-        # Calculate episode metrics
         avg_reward_100 = np.mean(list(episode_rewards)[-100:])
         success_rate_100 = np.mean(list(episode_successes)[-100:])
-
-        # Calculate average Q-value and Q-overestimation for this episode
         avg_q_value = np.mean(episode_q_values) if episode_q_values else 0.0
         # Calculate Q-overestimation: avg(Q-values) - avg(actual returns)
         avg_return = np.mean(episode_returns) if episode_returns else 0.0
         avg_q_overestimation = avg_q_value - avg_return
-
-        # Log episode summary with all metrics
         with open(episode_log_file, 'a') as f:
             f.write(f"{episode},{episode_reward:.6f},{episode_reward_agent1:.6f},{episode_reward_agent2:.6f},"
                    f"{episode_length},{cubes_picked_final},{episode_success:.6f},"
@@ -938,7 +850,6 @@ def main():
                    f"{avg_q_value:.6f},{avg_q_overestimation:.6f},"
                    f"{avg_reward_100:.6f},{success_rate_100:.6f}\n")
 
-        # W&B logging (per-episode)
         if args.use_wandb:
             import wandb
             wandb.log({
@@ -967,11 +878,9 @@ def main():
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-    # Save final model
     final_path = os.path.join(model_dir, f"{run_name}_final.pt")
     agent.save(final_path)
 
-    # Save metadata
     metadata = {
         "method": "gat_cvd_isaacsim",
         "algorithm": "gat_cvd",
@@ -1001,7 +910,6 @@ def main():
     print(f"Success rate (last 100 ep): {metadata['success_rate_100']:.2%}")
     print("=" * 60)
 
-    # Finish W&B run
     if args.use_wandb:
         import wandb
         wandb.finish()
