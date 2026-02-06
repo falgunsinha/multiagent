@@ -1,11 +1,3 @@
-"""
-Train Double DQN Agent for Object Selection with A* Path Planning
-Uses Double DQN algorithm instead of PPO.
-
-Usage:
-    py -3.11 train_astar_ddqn.py --timesteps 50000 --grid_size 4 --num_cubes 9
-"""
-
 import argparse
 import os
 import sys
@@ -14,7 +6,6 @@ from datetime import datetime
 import numpy as np
 import json
 
-# Add project root to path
 project_root = Path(r"C:\isaacsim\cobotproject")
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -27,8 +18,6 @@ from src.rl.doubleDQN import DoubleDQNAgent
 def parse_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(description="Train Double DQN agent with A* path planning")
-    
-    # Training parameters
     parser.add_argument("--timesteps", type=int, default=None,
                        help="Total training timesteps (auto-set based on grid/cubes if not specified)")
     parser.add_argument("--learning_rate", type=float, default=1e-3,
@@ -54,16 +43,13 @@ def parse_args():
                        help="Warmup steps before training (default: 1000)")
     parser.add_argument("--use_wandb", action="store_true",
                        help="Use Weights & Biases for logging")
-    
-    # Environment parameters
+
     parser.add_argument("--grid_size", type=int, default=4,
                        help="Grid size (default: 4)")
     parser.add_argument("--num_cubes", type=int, default=9,
                        help="Number of cubes (default: 9)")
     parser.add_argument("--max_steps", type=int, default=50,
                        help="Max steps per episode (default: 50)")
-    
-    # Saving
     parser.add_argument("--save_freq", type=int, default=5000,
                        help="Save checkpoint every N steps (default: 5000)")
     parser.add_argument("--model_dir", type=str,
@@ -72,12 +58,8 @@ def parse_args():
     parser.add_argument("--log_dir", type=str,
                        default=r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\logs",
                        help="Directory for logs")
-
-    # Resume training
     parser.add_argument("--resume", type=str, default=None,
                        help="Path to checkpoint to resume from (e.g., models/checkpoint_step_25000.pt)")
-
-    # Misc
     parser.add_argument("--seed", type=int, default=42,
                        help="Random seed (default: 42)")
     
@@ -99,11 +81,8 @@ def main():
             args.timesteps = 10000  # Default
         print(f"Auto-set timesteps to {args.timesteps} based on grid_size={args.grid_size}, num_cubes={args.num_cubes}")
 
-    # Set random seeds
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
-
-    # Initialize W&B if requested
     wandb_run = None
     if args.use_wandb:
         try:
@@ -129,7 +108,6 @@ def main():
                 }
             )
 
-            # Setup charts from separate config file (can be updated without retraining)
             try:
                 from wandb_chart_config import setup_wandb_charts
                 setup_wandb_charts()
@@ -148,11 +126,9 @@ def main():
             print("Please check your W&B login: py -3.11 -m wandb login")
             sys.exit(1)
 
-    # Create directories
+
     os.makedirs(args.model_dir, exist_ok=True)
     os.makedirs(args.log_dir, exist_ok=True)
-    
-    # Print configuration
     print("=" * 60)
     print("DOUBLE DQN TRAINING - A* PATH PLANNING")
     print("=" * 60)
@@ -165,8 +141,7 @@ def main():
     print(f"Gamma: {args.gamma}")
     print(f"Epsilon: {args.epsilon_start} -> {args.epsilon_end} (decay: {args.epsilon_decay})")
     print("=" * 60)
-    
-    # Create environment
+
     max_objects = args.grid_size * args.grid_size
     env = ObjectSelectionEnvAStar(
         franka_controller=None,
@@ -177,7 +152,6 @@ def main():
         render_mode=None
     )
     
-    # Create agent
     state_dim = max_objects * 6  # 6 features per object
     action_dim = max_objects
 
@@ -198,7 +172,6 @@ def main():
         warmup_steps=args.warmup_steps
     )
 
-    # Resume from checkpoint if specified
     total_steps = 0
     episode = 0
     if args.resume:
@@ -216,23 +189,16 @@ def main():
         print(f"Resuming from step {total_steps}, episode {episode}")
         print(f"Current epsilon: {agent.epsilon:.4f}")
         print(f"{'='*60}\n")
-
-        # Extract run_name from checkpoint path
         checkpoint_name = os.path.basename(args.resume)
-        # Format: ddqn_astar_grid4_cubes9_20251219_115447_step_25000.pt
         run_name = '_'.join(checkpoint_name.split('_')[:-2])  # Remove _step_XXXXX.pt
     else:
-        # Training loop
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         run_name = f"ddqn_astar_grid{args.grid_size}_cubes{args.num_cubes}_{timestamp}"
 
-    # Create enhanced log files
     log_file = os.path.join(args.log_dir, f"{run_name}_training.csv")
     episode_log_file = os.path.join(args.log_dir, f"{run_name}_episodes.csv")
 
-    # Create or append to log files
     if args.resume:
-        # Append mode - files should already exist
         if not os.path.exists(log_file):
             print(f"WARNING: Training log not found, creating new: {log_file}")
             with open(log_file, 'w') as f:
@@ -242,7 +208,6 @@ def main():
             with open(episode_log_file, 'w') as f:
                 f.write("episode,total_reward,length,success,avg_reward_100,success_rate_100\n")
     else:
-        # Create new log files
         with open(log_file, 'w') as f:
             f.write("step,episode,loss,step_reward,epsilon,q_value,episode_reward,episode_length,avg_reward_100,success_rate\n")
 
@@ -266,50 +231,29 @@ def main():
         done = False
 
         while not done and total_steps < args.timesteps:
-            # Get action mask
             action_mask = info.get('action_mask', env.action_masks())
-
-            # Select action
             action = agent.select_action(state, action_mask)
-
-            # Take step
             next_state, reward, terminated, truncated, info = env.step(action)
             done = terminated or truncated
-
-            # Get next action mask
             next_action_mask = info.get('action_mask', env.action_masks())
-
-            # Store transition
             agent.store_transition(state, action, reward, next_state, done, action_mask, next_action_mask)
-
-            # Train
             loss = agent.train_step()
-
-            # Update state
             state = next_state
             episode_reward += reward
             episode_length += 1
             total_steps += 1
-
-            # Calculate metrics for logging
             avg_reward_100 = np.mean(episode_rewards[-100:]) if episode_rewards else 0.0
             success_rate = np.mean(episode_successes[-100:]) if episode_successes else 0.0
-
-            # Enhanced CSV logging (10 metrics)
             with open(log_file, 'a') as f:
                 loss_val = f"{loss:.6f}" if loss is not None else ""
                 q_val = f"{agent.last_q_value:.6f}"
                 f.write(f"{total_steps},{episode},{loss_val},{reward:.6f},{agent.epsilon:.6f},"
                        f"{q_val},{episode_reward:.6f},{episode_length},{avg_reward_100:.6f},{success_rate:.6f}\n")
-
-            # W&B logging (per-step metrics)
             if args.use_wandb:
                 import wandb
                 wandb.log({
-                    # Step counter (required for custom step metric)
+                    
                     "global_step": total_steps,
-
-                    # Basic training metrics
                     "training/loss": loss if loss is not None else 0.0,
                     "train/loss_raw": loss if loss is not None else 0.0,
                     "training/epsilon": agent.epsilon,
@@ -317,23 +261,16 @@ def main():
                     "training/step_reward": reward,
                     "training/episode_reward_running": episode_reward,
                     "training/episode_length_running": episode_length,
-
-                    # Advanced Q-value statistics
                     "train/q_mean": agent.q_mean,
                     "train/q_max": agent.q_max,
                     "train/q_std": agent.q_std,
-
-                    # DDQN overestimation bias tracking
                     "ddqn/q_policy": agent.q_max,
                     "ddqn/q_target": agent.value_estimate,
                     "ddqn/q_overestimation": agent.q_overestimation,
                     "ddqn/value_estimate": agent.value_estimate,
-
-                    # TD error
                     "train/td_error": agent.td_error
                 })
 
-            # Print progress
             if total_steps % 1000 == 0:
                 loss_str = f"{loss:.4f}" if loss else "0.0000"
                 print(f"Steps: {total_steps}/{args.timesteps} | "
@@ -342,27 +279,19 @@ def main():
                       f"Epsilon: {agent.epsilon:.4f} | "
                       f"Loss: {loss_str}")
 
-            # Save checkpoint
             if total_steps % args.save_freq == 0:
                 checkpoint_path = os.path.join(args.model_dir, f"{run_name}_step_{total_steps}.pt")
                 agent.save(checkpoint_path)
-
-        # Episode finished
         episode_success = 1.0 if len(env.objects_picked) == env.num_cubes else 0.0
         episode_rewards.append(episode_reward)
         episode_lengths.append(episode_length)
         episode_successes.append(episode_success)
-
-        # Calculate episode metrics
         avg_reward_100 = np.mean(episode_rewards[-100:])
         success_rate_100 = np.mean(episode_successes[-100:])
-
-        # Log episode summary
         with open(episode_log_file, 'a') as f:
             f.write(f"{episode},{episode_reward:.6f},{episode_length},{int(episode_success)},"
                    f"{avg_reward_100:.6f},{success_rate_100:.6f}\n")
 
-        # W&B logging (per-episode metrics)
         if args.use_wandb:
             import wandb
             wandb.log({
@@ -377,11 +306,8 @@ def main():
         agent.episodes += 1
         episode += 1
 
-    # Save final model
     final_path = os.path.join(args.model_dir, f"{run_name}_final.pt")
     agent.save(final_path)
-
-    # Save metadata
     metadata = {
         "method": "astar",
         "algorithm": "double_dqn",
