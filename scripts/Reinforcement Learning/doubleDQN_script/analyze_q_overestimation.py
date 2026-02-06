@@ -70,8 +70,6 @@ for name, run_id in runs_to_analyze.items():
     run_dir = wandb_dir / run_id
     print(f"\nSyncing {name}...")
 
-    # Note: This will try to sync to wandb servers
-    # For offline analysis, we need a different approach
 
 print("\n" + "="*80)
 print("Let me try reading the event logs instead...")
