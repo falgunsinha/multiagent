@@ -1,7 +1,3 @@
-"""
-Identify all wandb runs and group them by configuration.
-"""
-
 from pathlib import Path
 import yaml
 
@@ -18,17 +14,12 @@ for run_dir in sorted(wandb_dir.glob('run-*')):
     if config_file.exists():
         with open(config_file, 'r') as f:
             config = yaml.safe_load(f)
-        
-        # Extract configuration
+    
         method = config.get('method', {}).get('value', 'unknown')
         grid_size = config.get('grid_size', {}).get('value', 'unknown')
         num_cubes = config.get('num_cubes', {}).get('value', 'unknown')
         timesteps = config.get('timesteps', {}).get('value', 'unknown')
-        
-        # Create config key
         config_key = f"{method}_grid{grid_size}_cubes{num_cubes}"
-        
-        # Store run info
         if config_key not in runs_by_config:
             runs_by_config[config_key] = []
         
@@ -41,7 +32,6 @@ for run_dir in sorted(wandb_dir.glob('run-*')):
             'run_dir': run_dir
         })
 
-# Print summary
 print("\nRuns grouped by configuration:")
 print("="*80)
 
@@ -51,7 +41,7 @@ for config_key, runs in sorted(runs_by_config.items()):
     for i, run in enumerate(runs, 1):
         print(f"  Run {i}: {run['run_id']} (timesteps: {run['timesteps']})")
 
-# Identify configurations with grid4_cubes9
+
 print("\n" + "="*80)
 print("Grid 4 Objects 9 configurations:")
 print("="*80)
