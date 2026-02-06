@@ -8,12 +8,6 @@ from onpolicy.utils.valuenorm import ValueNorm
 from onpolicy.algorithms.r_mappo.algorithm.r_actor_critic import R_Actor
 
 class HATRPO():
-    """
-    Trainer class for MATRPO to update policies.
-    :param args: (argparse.Namespace) arguments containing relevant model, policy, and env information.
-    :param policy: (HATRPO_Policy) policy to update.
-    :param device: (torch.device) specifies the device to run on (cpu/gpu).
-    """
     def __init__(self,
                  args,
                  policy,
@@ -54,15 +48,6 @@ class HATRPO():
 
 
     def cal_value_loss(self, values, value_preds_batch, return_batch, active_masks_batch):
-        """
-        Calculate value function loss.
-        :param values: (torch.Tensor) value function predictions.
-        :param value_preds_batch: (torch.Tensor) "old" value  predictions from data batch (used for value clip loss)
-        :param return_batch: (torch.Tensor) reward to go returns.
-        :param active_masks_batch: (torch.Tensor) denotes if agent is active or dead at a given timesep.
-
-        :return value_loss: (torch.Tensor) value function loss.
-        """
         if self._use_popart or self._use_valuenorm:
             value_pred_clipped = value_preds_batch + (values - value_preds_batch).clamp(-self.clip_param,
                                                                                         self.clip_param)
@@ -152,8 +137,6 @@ class HATRPO():
             kl=kl.sum(1, keepdim=True)
         return kl
 
-    # from openai baseline code
-    # https://github.com/openai/baselines/blob/master/baselines/common/cg.py
     def conjugate_gradient(self, actor, obs, rnn_states, action, masks, available_actions, active_masks, b, nsteps, residual_tol=1e-10):
         x = torch.zeros(b.size()).to(device=self.device)
         r = b.clone()
@@ -184,18 +167,6 @@ class HATRPO():
         return kl_hessian_p + 0.1 * p
 
     def trpo_update(self, sample, update_actor=True):
-        """
-        Update actor and critic networks.
-        :param sample: (Tuple) contains data batch with which to update networks.
-        :update_actor: (bool) whether to update actor network.
-
-        :return value_loss: (torch.Tensor) value function loss.
-        :return critic_grad_norm: (torch.Tensor) gradient norm from critic update.
-        ;return policy_loss: (torch.Tensor) actor(policy) loss value.
-        :return dist_entropy: (torch.Tensor) action entropies.
-        :return actor_grad_norm: (torch.Tensor) gradient norm from actor update.
-        :return imp_weights: (torch.Tensor) importance sampling weights.
-        """
         share_obs_batch, obs_batch, rnn_states_batch, rnn_states_critic_batch, actions_batch, \
         value_preds_batch, return_batch, masks_batch, active_masks_batch, old_action_log_probs_batch, \
         adv_targ, available_actions_batch, factor_batch = sample
@@ -216,7 +187,6 @@ class HATRPO():
                                                                               available_actions_batch,
                                                                               active_masks_batch)
 
-        # critic update
         value_loss = self.cal_value_loss(values, value_preds_batch, return_batch, active_masks_batch)
 
         self.policy.critic_optimizer.zero_grad()
@@ -230,7 +200,6 @@ class HATRPO():
 
         self.policy.critic_optimizer.step()
 
-        # actor update
         ratio = torch.prod(torch.exp(action_log_probs - old_action_log_probs_batch),dim=-1,keepdim=True)
         if self._use_policy_active_masks:
             loss = (torch.sum(ratio * factor_batch * adv_targ, dim=-1, keepdim=True) *
@@ -274,7 +243,6 @@ class HATRPO():
         expected_improve = (loss_grad * full_step).sum(0, keepdim=True)
         expected_improve = expected_improve.data.cpu().numpy()
         
-        # Backtracking line search
         flag = False
         fraction = 1
         for i in range(self.ls_step):
@@ -323,13 +291,6 @@ class HATRPO():
         return value_loss, critic_grad_norm, kl, loss_improve, expected_improve, dist_entropy, ratio
 
     def train(self, buffer, update_actor=True):
-        """
-        Perform a training update using minibatch GD.
-        :param buffer: (SharedReplayBuffer) buffer containing training data.
-        :param update_actor: (bool) whether to update actor network.
-
-        :return train_info: (dict) contains information regarding training update (e.g. loss, grad norms, etc).
-        """
         if self._use_popart:
             advantages = buffer.returns[:-1] - self.value_normalizer.denormalize(buffer.value_preds[:-1])
         else:
