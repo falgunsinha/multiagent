@@ -1,12 +1,3 @@
-"""
-Test Double DQN Agent
-Evaluate trained Double DQN model on test episodes.
-
-Usage:
-    cd "C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script"
-    py -3.11 test_ddqn.py --model_path "models\ddqn_astar_grid4_cubes9_YYYYMMDD_HHMMSS_final.pt" --episodes 100
-"""
-
 import argparse
 import os
 import sys
@@ -14,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import json
 
-# Add project root to path
 project_root = Path(r"C:\isaacsim\cobotproject")
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -65,8 +55,6 @@ def main():
     print(f"Cubes: {metadata['num_cubes']}")
     print(f"Test episodes: {args.episodes}")
     print("=" * 60)
-    
-    # Create environment
     method = metadata.get('method', 'heuristic')
     max_objects = metadata['max_objects']
     grid_size = metadata['training_grid_size']
@@ -99,8 +87,7 @@ def main():
             training_grid_size=grid_size,
             render_mode=None
         )
-    
-    # Create agent
+
     state_dim = max_objects * 6
     action_dim = max_objects
     
@@ -114,7 +101,6 @@ def main():
         epsilon_decay=1.0
     )
     
-    # Load model
     agent.load(args.model_path)
     agent.epsilon = 0.0  # Ensure no exploration
     
@@ -156,7 +142,6 @@ def main():
                   f"Avg Reward: {np.mean(episode_rewards):.2f} | "
                   f"Success Rate: {100*success_count/(episode+1):.1f}%")
     
-    # Print results
     print("\n" + "=" * 60)
     print("TEST RESULTS")
     print("=" * 60)
