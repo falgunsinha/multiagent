@@ -1,11 +1,3 @@
-"""
-Train Double DQN Agent for Object Selection with RRT Viz (PythonRobotics)
-Uses Double DQN algorithm with PythonRobotics RRT for visualization.
-
-Usage:
-    py -3.11 train_rrt_viz_ddqn.py --timesteps 50000 --grid_size 4 --num_cubes 9
-"""
-
 import argparse
 import os
 import sys
@@ -13,8 +5,6 @@ from pathlib import Path
 from datetime import datetime
 import numpy as np
 import json
-
-# Add project root to path
 project_root = Path(r"C:\isaacsim\cobotproject")
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -63,7 +53,7 @@ def parse_args():
     parser.add_argument("--max_steps", type=int, default=50,
                        help="Max steps per episode (default: 50)")
     
-    # Saving
+ 
     parser.add_argument("--save_freq", type=int, default=5000,
                        help="Save checkpoint every N steps (default: 5000)")
     parser.add_argument("--model_dir", type=str,
@@ -99,11 +89,11 @@ def main():
             args.timesteps = 10000  # Default
         print(f"Auto-set timesteps to {args.timesteps} based on grid_size={args.grid_size}, num_cubes={args.num_cubes}")
 
-    # Set random seeds
+
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    # Initialize W&B if requested
+
     if args.use_wandb:
         try:
             import wandb
@@ -128,7 +118,7 @@ def main():
                 }
             )
 
-            # Setup charts from separate config file (can be updated without retraining)
+            
             try:
                 from wandb_chart_config import setup_wandb_charts
                 setup_wandb_charts()
@@ -151,7 +141,7 @@ def main():
     os.makedirs(args.model_dir, exist_ok=True)
     os.makedirs(args.log_dir, exist_ok=True)
     
-    # Print configuration
+
     print("=" * 60)
     print("DOUBLE DQN TRAINING - RRT VIZ (PythonRobotics)")
     print("=" * 60)
@@ -265,32 +255,20 @@ def main():
         done = False
         
         while not done and total_steps < args.timesteps:
-            # Get action mask
             action_mask = info.get('action_mask', env.action_masks())
             
-            # Select action
+           
             action = agent.select_action(state, action_mask)
-            
-            # Take step
+
             next_state, reward, terminated, truncated, info = env.step(action)
             done = terminated or truncated
-
-            # Get next action mask
             next_action_mask = info.get('action_mask', env.action_masks())
-
-            # Store transition
             agent.store_transition(state, action, reward, next_state, done, action_mask, next_action_mask)
-
-            # Train
             loss = agent.train_step()
-
-            # Update state
             state = next_state
             episode_reward += reward
             episode_length += 1
             total_steps += 1
-
-            # Calculate metrics for logging
             avg_reward_100 = np.mean(episode_rewards[-100:]) if episode_rewards else 0.0
             success_rate = np.mean(episode_successes[-100:]) if episode_successes else 0.0
 
@@ -307,8 +285,6 @@ def main():
                 wandb.log({
                     # Step counter (required for custom step metric)
                     "global_step": total_steps,
-
-                    # Basic training metrics
                     "training/loss": loss if loss is not None else 0.0,
                     "train/loss_raw": loss if loss is not None else 0.0,
                     "training/epsilon": agent.epsilon,
@@ -316,13 +292,9 @@ def main():
                     "training/step_reward": reward,
                     "training/episode_reward_running": episode_reward,
                     "training/episode_length_running": episode_length,
-
-                    # Advanced Q-value statistics
                     "train/q_mean": agent.q_mean,
                     "train/q_max": agent.q_max,
                     "train/q_std": agent.q_std,
-
-                    # DDQN overestimation bias tracking
                     "ddqn/q_policy": agent.q_max,
                     "ddqn/q_target": agent.value_estimate,
                     "ddqn/q_overestimation": agent.q_overestimation,
@@ -340,19 +312,14 @@ def main():
                       f"Avg Reward (100 ep): {avg_reward_100:.2f} | "
                       f"Epsilon: {agent.epsilon:.4f} | "
                       f"Loss: {loss_str}")
-
-            # Save checkpoint
             if total_steps % args.save_freq == 0:
                 checkpoint_path = os.path.join(args.model_dir, f"{run_name}_step_{total_steps}.pt")
                 agent.save(checkpoint_path)
 
-        # Episode finished
         episode_success = 1.0 if len(env.objects_picked) == env.num_cubes else 0.0
         episode_rewards.append(episode_reward)
         episode_lengths.append(episode_length)
         episode_successes.append(episode_success)
-
-        # Calculate episode metrics
         avg_reward_100 = np.mean(episode_rewards[-100:])
         success_rate_100 = np.mean(episode_successes[-100:])
 
@@ -376,11 +343,8 @@ def main():
         agent.episodes += 1
         episode += 1
 
-    # Save final model
     final_path = os.path.join(args.model_dir, f"{run_name}_final.pt")
     agent.save(final_path)
-
-    # Save metadata
     metadata = {
         "method": "rrt_viz",
         "algorithm": "double_dqn",
