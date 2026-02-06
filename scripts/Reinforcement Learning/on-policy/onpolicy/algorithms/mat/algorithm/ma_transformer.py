@@ -63,7 +63,6 @@ class SelfAttention(nn.Module):
 
 
 class EncodeBlock(nn.Module):
-    """ an unassuming Transformer block """
 
     def __init__(self, n_embd, n_head, n_agent):
         super(EncodeBlock, self).__init__()
@@ -85,7 +84,6 @@ class EncodeBlock(nn.Module):
 
 
 class DecodeBlock(nn.Module):
-    """ an unassuming Transformer block """
 
     def __init__(self, n_embd, n_head, n_agent):
         super(DecodeBlock, self).__init__()
@@ -131,8 +129,6 @@ class Encoder(nn.Module):
                                   init_(nn.Linear(n_embd, 1)))
 
     def forward(self, state, obs):
-        # state: (batch, n_agent, state_dim)
-        # obs: (batch, n_agent, obs_dim)
         if self.encode_state:
             state_embeddings = self.state_encoder(state)
             x = state_embeddings
@@ -198,7 +194,6 @@ class Decoder(nn.Module):
             log_std = torch.zeros(self.action_dim).to(device)
             self.log_std.data = log_std
 
-    # state, action, and return
     def forward(self, action, obs_rep, obs):
         # action: (batch, n_agent, action_dim), one-hot/logits?
         # obs_rep: (batch, n_agent, n_embd)
@@ -247,12 +242,6 @@ class MultiAgentTransformer(nn.Module):
             self.decoder.zero_std(self.device)
 
     def forward(self, state, obs, action, available_actions=None):
-        # state: (batch, n_agent, state_dim)
-        # obs: (batch, n_agent, obs_dim)
-        # action: (batch, n_agent, 1)
-        # available_actions: (batch, n_agent, act_dim)
-
-        # state unused
         ori_shape = np.shape(state)
         state = np.zeros((*ori_shape[:-1], 37), dtype=np.float32)
 
@@ -276,7 +265,6 @@ class MultiAgentTransformer(nn.Module):
         return action_log, v_loc, entropy
 
     def get_actions(self, state, obs, available_actions=None, deterministic=False):
-        # state unused
         ori_shape = np.shape(obs)
         state = np.zeros((*ori_shape[:-1], 37), dtype=np.float32)
 
@@ -299,7 +287,6 @@ class MultiAgentTransformer(nn.Module):
         return output_action, output_action_log, v_loc
 
     def get_values(self, state, obs):
-        # state unused
         ori_shape = np.shape(state)
         state = np.zeros((*ori_shape[:-1], 37), dtype=np.float32)
 
