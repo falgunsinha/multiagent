@@ -1,14 +1,7 @@
-"""
-Script to extract q_overestimation data from wandb runs.
-This uses wandb's internal protobuf format reader.
-"""
-
 import json
 import pandas as pd
 from pathlib import Path
 import sys
-
-# Define the runs we want to analyze
 runs_to_analyze = {
     'A* Grid 4 Objects 9': 'run-20251220_021934-saemm4ho',
     'RRT Viz Grid 4 Objects 9': 'run-20251220_134743-dbi680zb',
@@ -20,10 +13,9 @@ wandb_dir = Path(r'C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubl
 def parse_wandb_file(wandb_file_path):
     """
     Parse the wandb binary file to extract history data.
-    The .wandb file uses Protocol Buffers format.
     """
     try:
-        # Import wandb's internal protobuf definitions
+      
         from wandb.proto import wandb_internal_pb2
         
         history_data = []
@@ -57,7 +49,6 @@ def parse_wandb_file(wandb_file_path):
         print(f"Error parsing wandb file: {e}")
         return None
 
-# Try a simpler approach: use wandb CLI to export data
 import subprocess
 import os
 
@@ -72,14 +63,8 @@ for name, run_id in runs_to_analyze.items():
     
     print(f"\nProcessing: {name}")
     print(f"Run ID: {actual_run_id}")
-    
-    # Try to export using wandb CLI
     output_csv = run_dir / 'files' / 'exported_history.csv'
-    
-    # Change to the wandb directory
     os.chdir(run_dir.parent)
-    
-    # Try wandb export command
     cmd = f'wandb export --id {actual_run_id} --csv'
     print(f"Running: {cmd}")
     
@@ -106,10 +91,6 @@ for name, run_id in runs_to_analyze.items():
 print("\n" + "="*80)
 print("Trying alternative: Read from wandb service database")
 print("="*80)
-
-# Wandb stores data in a local SQLite database when running offline
-# Let's try to find and read that database
-
 wandb_service_dir = wandb_dir.parent / '.wandb'
 if wandb_service_dir.exists():
     print(f"Found wandb service directory: {wandb_service_dir}")
@@ -121,8 +102,6 @@ else:
 print("\n" + "="*80)
 print("Final attempt: Parse the output.log file for metrics")
 print("="*80)
-
-# As a fallback, we can parse the output.log file which might contain the metrics
 for name, run_id in runs_to_analyze.items():
     run_dir = wandb_dir / run_id
     output_log = run_dir / 'files' / 'output.log'
