@@ -7,12 +7,6 @@ from onpolicy.algorithms.utils.util import check
 
 
 class MATTrainer:
-    """
-    Trainer class for MAPPO to update policies.
-    :param args: (argparse.Namespace) arguments containing relevant model, policy, and env information.
-    :param policy: (R_MAPPO_Policy) policy to update.
-    :param device: (torch.device) specifies the device to run on (cpu/gpu).
-    """
     def __init__(self,
                  args,
                  policy,
@@ -49,15 +43,6 @@ class MATTrainer:
             self.value_normalizer = None
 
     def cal_value_loss(self, values, value_preds_batch, return_batch, active_masks_batch):
-        """
-        Calculate value function loss.
-        :param values: (torch.Tensor) value function predictions.
-        :param value_preds_batch: (torch.Tensor) "old" value  predictions from data batch (used for value clip loss)
-        :param return_batch: (torch.Tensor) reward to go returns.
-        :param active_masks_batch: (torch.Tensor) denotes if agent is active or dead at a given timesep.
-
-        :return value_loss: (torch.Tensor) value function loss.
-        """
 
         value_pred_clipped = value_preds_batch + (values - value_preds_batch).clamp(-self.clip_param,
                                                                                     self.clip_param)
@@ -82,7 +67,6 @@ class MATTrainer:
         else:
             value_loss = value_loss_original
 
-        # if self._use_value_active_masks and not self.dec_actor:
         if self._use_value_active_masks:
             value_loss = (value_loss * active_masks_batch).sum() / active_masks_batch.sum()
         else:
@@ -91,18 +75,7 @@ class MATTrainer:
         return value_loss
 
     def ppo_update(self, sample):
-        """
-        Update actor and critic networks.
-        :param sample: (Tuple) contains data batch with which to update networks.
-        :update_actor: (bool) whether to update actor network.
-
-        :return value_loss: (torch.Tensor) value function loss.
-        :return critic_grad_norm: (torch.Tensor) gradient norm from critic up9date.
-        ;return policy_loss: (torch.Tensor) actor(policy) loss value.
-        :return dist_entropy: (torch.Tensor) action entropies.
-        :return actor_grad_norm: (torch.Tensor) gradient norm from actor update.
-        :return imp_weights: (torch.Tensor) importance sampling weights.
-        """
+    
         if len(sample) == 12:
             share_obs_batch, obs_batch, rnn_states_batch, rnn_states_critic_batch, actions_batch, \
             value_preds_batch, return_batch, masks_batch, active_masks_batch, old_action_log_probs_batch, \
@@ -117,8 +90,6 @@ class MATTrainer:
         value_preds_batch = check(value_preds_batch).to(**self.tpdv)
         return_batch = check(return_batch).to(**self.tpdv)
         active_masks_batch = check(active_masks_batch).to(**self.tpdv)
-
-        # Reshape to do in a single forward pass for all steps
         values, action_log_probs, dist_entropy = self.policy.evaluate_actions(share_obs_batch,
                                                                               obs_batch, 
                                                                               rnn_states_batch, 
@@ -127,7 +98,6 @@ class MATTrainer:
                                                                               masks_batch, 
                                                                               available_actions_batch,
                                                                               active_masks_batch)
-        # actor update
         imp_weights = torch.exp(action_log_probs - old_action_log_probs_batch)
 
         surr1 = imp_weights * adv_targ
@@ -140,7 +110,7 @@ class MATTrainer:
         else:
             policy_loss = -torch.sum(torch.min(surr1, surr2), dim=-1, keepdim=True).mean()
 
-        # critic update
+    
         value_loss = self.cal_value_loss(values, value_preds_batch, return_batch, active_masks_batch)
 
         loss = policy_loss - dist_entropy * self.entropy_coef + value_loss * self.value_loss_coef
@@ -158,13 +128,6 @@ class MATTrainer:
         return value_loss, grad_norm, policy_loss, dist_entropy, grad_norm, imp_weights
 
     def train(self, buffer):
-        """
-        Perform a training update using minibatch GD.
-        :param buffer: (SharedReplayBuffer) buffer containing training data.
-        :param update_actor: (bool) whether to update actor network.
-
-        :return train_info: (dict) contains information regarding training update (e.g. loss, grad norms, etc).
-        """
         advantages_copy = buffer.advantages.copy()
         advantages_copy[buffer.active_masks[:-1] == 0.0] = np.nan
         mean_advantages = np.nanmean(advantages_copy)
