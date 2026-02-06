@@ -1,20 +1,9 @@
-"""
-Resume Double DQN Training with RRT Path Planning in Isaac Sim
-
-This script resumes training from the last checkpoint (45,000 steps)
-and continues for the remaining 5,000 steps to reach 50,000 total.
-
-Usage:
-    C:\isaacsim\python.bat resume_rrt_isaacsim_ddqn.py --checkpoint_path <path_to_checkpoint>
-"""
-
 import argparse
 import sys
 from pathlib import Path
 import gc
 import torch
 
-# Parse command-line arguments BEFORE importing Isaac Sim
 parser = argparse.ArgumentParser(description="Resume Double DQN agent training with Isaac Sim RRT")
 parser.add_argument("--checkpoint_path", type=str,
                    default="auto",
@@ -25,7 +14,6 @@ parser.add_argument("--save_freq", type=int, default=5000,
                    help="Save checkpoint every N steps (default: 5000)")
 args = parser.parse_args()
 
-# Auto-detect latest checkpoint if not specified
 if args.checkpoint_path == "auto":
     models_dir = Path(r"C:\isaacsim\cobotproject\scripts\Reinforcement Learning\doubleDQN_script\models")
     # Find latest checkpoint (not final, not emergency)
@@ -44,12 +32,10 @@ if args.checkpoint_path == "auto":
 else:
     args.checkpoint_path = str(Path(args.checkpoint_path))
 
-# Clear CUDA cache before starting
 if torch.cuda.is_available():
     torch.cuda.empty_cache()
     print("[RESUME] Cleared CUDA cache")
 
-# Create SimulationApp BEFORE importing any Isaac Sim modules
 try:
     from isaacsim import SimulationApp
 except ImportError:
@@ -64,8 +50,6 @@ from datetime import datetime
 import json
 import omni.timeline
 import omni.usd
-
-# Isaac Sim imports
 from isaacsim.core.api import World
 from isaacsim.core.prims import SingleXFormPrim
 from isaacsim.core.utils.stage import add_reference_to_stage
@@ -76,8 +60,6 @@ from isaacsim.core.utils.numpy.rotations import euler_angles_to_quats
 from isaacsim.robot_motion.motion_generation.lula import RRT
 from isaacsim.robot_motion.motion_generation import ArticulationKinematicsSolver, LulaKinematicsSolver, PathPlannerVisualizer
 from pxr import UsdGeom, UsdPhysics
-
-# Add project root to path
 project_root = Path(r"C:\isaacsim\cobotproject")
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -88,9 +70,6 @@ from src.grippers import ParallelGripper
 from src.rl.object_selection_env_rrt import ObjectSelectionEnvRRT
 from src.rl.doubleDQN import DoubleDQNAgent
 
-
-# Copy FrankaRRTTrainer class here to avoid importing train_rrt_isaacsim_ddqn.py
-# (which has conflicting argument parser)
 class FrankaRRTTrainer:
     """
     Franka controller for RRT-based Double DQN training.
@@ -116,21 +95,13 @@ class FrankaRRTTrainer:
     def setup_scene(self):
         """Setup the scene with Franka, cubes, and container"""
         print(f"[TRAINER] Setting up scene...")
-
-        # Clear any existing world
         if World.instance() is not None:
             World.clear_instance()
-
-        # Create world
         self.world = World(stage_units_in_meters=1.0, physics_dt=1.0/60.0, rendering_dt=1.0/60.0)
         self.world.scene.add_default_ground_plane()
-
-        # Add Franka robot
         franka_prim_path = "/World/Franka"
         franka_usd_path = get_assets_root_path() + "/Isaac/Robots/FrankaRobotics/FrankaPanda/franka.usd"
         add_reference_to_stage(usd_path=franka_usd_path, prim_path=franka_prim_path)
-
-        # Create gripper
         self.gripper = ParallelGripper(
             end_effector_prim_path=f"{franka_prim_path}/panda_rightfinger",
             joint_prim_names=["panda_finger_joint1", "panda_finger_joint2"],
@@ -138,8 +109,6 @@ class FrankaRRTTrainer:
             joint_closed_positions=np.array([0.0, 0.0]),
             action_deltas=np.array([0.01, 0.01])
         )
-
-        # Add manipulator
         self.franka = self.world.scene.add(
             SingleManipulator(
                 prim_path=franka_prim_path,
@@ -151,7 +120,6 @@ class FrankaRRTTrainer:
             )
         )
 
-        # Add container
         container_prim_path = "/World/Container"
         container_usd_path = f"{get_assets_root_path()}/NVIDIA/Assets/DigitalTwin/Assets/Warehouse/Storage/Containers/Container_I/Container_I04_160x120x64cm_PR_V_NVD_01.usd"
         add_reference_to_stage(usd_path=container_usd_path, prim_path=container_prim_path)
@@ -170,14 +138,13 @@ class FrankaRRTTrainer:
             )
         )
 
-        # Add physics to container
         stage = omni.usd.get_context().get_stage()
         container_prim = stage.GetPrimAtPath(container_prim_path)
         rigid_body_api = UsdPhysics.RigidBodyAPI.Apply(container_prim)
         rigid_body_api.CreateKinematicEnabledAttr(True)
         UsdPhysics.CollisionAPI.Apply(container_prim)
 
-        # Add cubes
+    
         cube_size = 0.0515
         if self.num_cubes <= 4:
             cube_spacing = 0.28
@@ -238,7 +205,6 @@ class FrankaRRTTrainer:
                 self.cube_positions.append(cube_position)
                 cube_index += 1
 
-        # Initialize RRT (using same setup as train_rrt_isaacsim_ddqn.py)
         mg_extension_path = get_extension_path_from_name("isaacsim.robot_motion.motion_generation")
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -266,7 +232,6 @@ class FrankaRRTTrainer:
             path_planner=self.rrt  # Correct parameter name
         )
 
-        # Initialize kinematics solvers (needed by ObjectSelectionEnvRRT)
         self.kinematics_solver = LulaKinematicsSolver(
             robot_description_path=robot_description_file,
             urdf_path=urdf_path
@@ -321,8 +286,7 @@ def main():
         simulation_app.close()
         return
     
-    # Extract training configuration from checkpoint filename
-    # Format: ddqn_rrt_isaacsim_grid4_cubes9_TIMESTAMP_step_XXXXX.pt
+ 
     filename_parts = checkpoint_path.stem.split('_')
     grid_size = 4  # default
     num_cubes = 9  # default
@@ -345,12 +309,10 @@ def main():
     print(f"[RESUME] Grid size: {grid_size}")
     print(f"[RESUME] Number of cubes: {num_cubes}")
     
-    # Setup directories (use same timestamp as original training)
     script_dir = Path(__file__).parent
     models_dir = script_dir / "models"
     logs_dir = script_dir / "logs"
 
-    # Use original timestamp for consistency
     if timestamp_str:
         model_name = f"ddqn_rrt_isaacsim_grid{grid_size}_cubes{num_cubes}_{timestamp_str}"
     else:
@@ -360,15 +322,12 @@ def main():
 
     print(f"[RESUME] Model name: {model_name}")
     print(f"[RESUME] Log file: {log_file}")
-
-    # Initialize trainer
     print(f"\n[RESUME] Setting up scene...")
     trainer = FrankaRRTTrainer(num_cubes=num_cubes, training_grid_size=grid_size)
     trainer.setup_scene()
 
     print(f"[RESUME] Scene setup complete")
 
-    # Create environment
     print(f"\n[RESUME] Creating RRT-based RL environment...")
     max_objects = grid_size * grid_size
 
@@ -388,8 +347,6 @@ def main():
     action_dim = env.action_space.n
 
     print(f"[RESUME] State dim: {state_dim}, Action dim: {action_dim}")
-
-    # Create agent
     print(f"\n[RESUME] Initializing Double DQN agent...")
     agent = DoubleDQNAgent(
         state_dim=state_dim,
@@ -403,22 +360,16 @@ def main():
         buffer_capacity=100000,  # Correct parameter name
         target_update_freq=1000
     )
-
-    # Load checkpoint
     print(f"\n[RESUME] Loading checkpoint weights...")
     agent.load(str(checkpoint_path))
     print(f"[RESUME] Checkpoint loaded successfully")
     print(f"[RESUME] Agent epsilon: {agent.epsilon:.6f}")
     print(f"[RESUME] Agent steps: {agent.steps}")
     print(f"[RESUME] Agent episodes: {agent.episodes}")
-
-    # Clear CUDA cache again after loading
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
         gc.collect()
         print(f"[RESUME] Cleared CUDA cache after loading checkpoint")
-
-    # Resume training
     print(f"\n{'='*80}")
     print(f"RESUMING TRAINING FROM STEP {current_steps}")
     print(f"{'='*80}\n")
@@ -432,56 +383,33 @@ def main():
 
     try:
         while step < args.target_timesteps:
-            # Get action mask (use action_masks() method, not get_action_mask())
             action_mask = info.get('action_mask', env.action_masks())
-
-            # Select action
             action = agent.select_action(state, action_mask)
-
-            # Take step
             next_state, reward, terminated, truncated, info = env.step(action)
             done = terminated or truncated
-
-            # Get next action mask
             next_action_mask = info.get('action_mask', env.action_masks())
-
-            # Store transition (with action masks)
             agent.store_transition(state, action, reward, next_state, done, action_mask, next_action_mask)
-
-            # Train
             loss = agent.train_step()
-
-            # Clear CUDA cache periodically to prevent memory buildup
             if step % 1000 == 0:
                 torch.cuda.empty_cache()
-
-            # Update state
             state = next_state
             episode_reward += reward
             step += 1
-
-            # Log training data (to CSV file)
             with open(log_file, 'a') as f:
                 loss_val = f"{loss:.6f}" if loss is not None else ""
                 f.write(f"{step},{episode},{loss_val},{reward:.6f},{agent.epsilon:.6f}\n")
-
-            # Episode end
             if done:
                 episode += 1
                 episode_time = time.time() - episode_start_time
 
-                # Print progress
                 if episode % 10 == 0:
                     print(f"[RESUME] Step {step}/{args.target_timesteps} | Episode {episode} | "
                           f"Reward: {episode_reward:.2f} | Epsilon: {agent.epsilon:.4f} | "
                           f"Time: {episode_time:.1f}s")
-
-                # Reset environment
                 state, info = env.reset()
                 episode_reward = 0
                 episode_start_time = time.time()
 
-            # Save checkpoint
             if step % args.save_freq == 0 and step > current_steps:
                 checkpoint_file = models_dir / f"{model_name}_step_{step}.pt"
                 agent.save(str(checkpoint_file))
@@ -491,7 +419,6 @@ def main():
                 torch.cuda.empty_cache()
                 gc.collect()
 
-        # Save final model
         final_checkpoint = models_dir / f"{model_name}_final.pt"
         agent.save(str(final_checkpoint))
         print(f"\n{'='*80}")
@@ -507,7 +434,6 @@ def main():
         import traceback
         traceback.print_exc()
 
-        # Save emergency checkpoint
         emergency_checkpoint = models_dir / f"{model_name}_step_{step}_emergency.pt"
         agent.save(str(emergency_checkpoint))
         print(f"[RESUME] Emergency checkpoint saved: {emergency_checkpoint.name}")
