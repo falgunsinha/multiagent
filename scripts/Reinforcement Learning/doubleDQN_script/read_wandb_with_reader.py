@@ -1,16 +1,10 @@
-"""
-Read wandb files using wandb's FileStreamApi reader.
-"""
-
 import pandas as pd
 from pathlib import Path
 import os
 import json
 
-# Disable wandb online mode
 os.environ['WANDB_MODE'] = 'offline'
 
-# Define the runs we want to analyze
 runs_to_analyze = {
     'A* Grid 4 Objects 9': 'run-20251220_021934-saemm4ho',
     'RRT Viz Grid 4 Objects 9': 'run-20251220_134743-dbi680zb',
@@ -35,7 +29,7 @@ try:
         print(f"\nProcessing: {name}")
         print(f"File: {wandb_file}")
         
-        # Use FileStreamApi to read the file
+
         fs = file_stream.FileStreamApi(str(wandb_file), 'r')
         
         history_data = []
@@ -49,12 +43,9 @@ try:
                     break
                 
                 record_count += 1
-                
-                # Parse the record
                 record = pb.Record()
                 record.ParseFromString(data)
                 
-                # Check for history data
                 if record.HasField('history'):
                     history = record.history
                     
@@ -112,7 +103,6 @@ try:
         print("\nNo data extracted. The wandb files might use a different format.")
         print("Let me check the file structure...")
         
-        # Try to peek at the file structure
         wandb_file = wandb_dir / runs_to_analyze['A* Grid 4 Objects 9'] / 'run-saemm4ho.wandb'
         with open(wandb_file, 'rb') as f:
             # Read first 100 bytes
