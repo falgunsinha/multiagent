@@ -1,12 +1,8 @@
-"""
-Test script to verify the notebook changes are working correctly
-"""
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import numpy as np
 from matplotlib.ticker import FuncFormatter
 
-# Test 1: Check available fonts
 print("=" * 80)
 print("TEST 1: Available Fonts")
 print("=" * 80)
@@ -26,7 +22,6 @@ if times_fonts:
 else:
     print("  NOT FOUND")
 
-# Test 2: Font configuration
 print("\n" + "=" * 80)
 print("TEST 2: Font Configuration")
 print("=" * 80)
@@ -44,7 +39,6 @@ else:
 print(f"Font family set to: {plt.rcParams['font.family']}")
 print(f"Font weight: {plt.rcParams['font.weight']}")
 
-# Test 3: Smoothing functions
 print("\n" + "=" * 80)
 print("TEST 3: Smoothing Functions")
 print("=" * 80)
@@ -57,14 +51,11 @@ def exponential_moving_average(data, weight=0.85):
         smoothed[i] = weight * smoothed[i-1] + (1 - weight) * data[i]
     return smoothed
 
-# Test data
 test_data = np.array([10, 8, 6, 4, 2, 1, 0.5, 0.3, 0.2, 0.1])
 smoothed = exponential_moving_average(test_data, weight=0.85)
 print(f"Original data: {test_data}")
 print(f"Smoothed data: {smoothed}")
 print(f"✓ Exponential MA working correctly")
-
-# Test 4: Thousands formatter
 print("\n" + "=" * 80)
 print("TEST 4: Thousands Formatter")
 print("=" * 80)
@@ -78,7 +69,6 @@ print(f"Original: {test_values}")
 print(f"Formatted: {formatted}")
 print(f"✓ Thousands formatter working correctly")
 
-# Test 5: Create a simple plot to verify all settings
 print("\n" + "=" * 80)
 print("TEST 5: Creating Test Plot")
 print("=" * 80)
