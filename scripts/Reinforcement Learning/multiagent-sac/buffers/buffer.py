@@ -1,4 +1,3 @@
-""" Packaged MASAC"""
 from typing import Dict, List, Deque, Tuple
 from collections import deque
 import numpy as np
