@@ -1,11 +1,3 @@
-"""
-Test MASAC on Grid 4x4, 9 Cubes ONLY (A* and RRT Viz)
-Simplified version that tests only one configuration with both planners
-
-Usage:
-    python test_masac_grid4_cubes9_native.py --episodes 5
-"""
-
 import sys
 from pathlib import Path
 import numpy as np
@@ -13,12 +5,8 @@ import json
 import csv
 from datetime import datetime
 import argparse
-
-# Add project root to path
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(project_root))
-
-# Add MASAC and MAPPO to path
 masac_path = Path(__file__).parent
 sys.path.insert(0, str(masac_path))
 mappo_path = Path(__file__).parent.parent / "MAPPO"
@@ -40,7 +28,7 @@ def load_ddqn_agent(model_path: str, env) -> DoubleDQNAgent:
     )
     agent.load(model_path)
     agent.epsilon = 0.01  # Set to test mode
-    print(f"✅ Loaded DDQN model: {model_path}")
+    print(f" Loaded DDQN model: {model_path}")
     return agent
 
 
@@ -56,14 +44,6 @@ def test_masac_configuration(
     """
     Test MASAC on a specific configuration
 
-    Args:
-        env_type: Environment type ('astar' or 'rrt_viz')
-        grid_size: Grid size
-        num_cubes: Number of cubes
-        num_episodes: Number of test episodes
-        log_dir: Directory to save logs
-        seed: Random seed for reproducibility
-        run_id: Run identifier
     """
     algorithm = "MASAC"
     scenario = f"grid{grid_size}_cubes{num_cubes}_{env_type}"
@@ -74,7 +54,7 @@ def test_masac_configuration(
         np.random.seed(seed)
         import random
         random.seed(seed)
-        print(f"🎲 Random seed set to: {seed}")
+        print(f" Random seed set to: {seed}")
 
     print(f"\n{'='*80}")
     print(f"Testing {algorithm}: {planner} | Grid {grid_size}x{grid_size} | {num_cubes} cubes")
@@ -107,7 +87,7 @@ def test_masac_configuration(
     }
 
     if config_key not in ddqn_model_mapping:
-        print(f"⚠️  No DDQN model mapping for {config_key}")
+        print(f"  No DDQN model mapping for {config_key}")
         return None
 
     ddqn_model_filename = ddqn_model_mapping[config_key]
@@ -115,15 +95,11 @@ def test_masac_configuration(
     ddqn_model_path = ddqn_models_dir / ddqn_model_filename
 
     if not ddqn_model_path.exists():
-        print(f"⚠️  DDQN model not found: {ddqn_model_path}")
+        print(f"  DDQN model not found: {ddqn_model_path}")
         return None
 
     ddqn_agent = load_ddqn_agent(str(ddqn_model_path), base_env)
-
-    # Calculate Agent 2 observation dimension
     agent2_state_dim = (num_cubes * 3) + 3 + num_cubes + (grid_size * grid_size) + 10
-
-    # Create MASAC wrapper with dimension adapter
     pretrained_path = project_root / "scripts" / "Reinforcement Learning" / "MASAC" / "pretrained_models"
     cube_spacing = 0.13 if grid_size > 3 else 0.15
 
@@ -150,7 +126,6 @@ def test_masac_configuration(
         verbose=False
     )
 
-    # Relax reshuffling thresholds for testing
     print("[TEST] Relaxing reshuffling thresholds for testing...")
     two_agent_env.reshuffle_decision.min_reachable_distance = 0.30
     two_agent_env.reshuffle_decision.max_reachable_distance = 0.90
@@ -166,14 +141,8 @@ def test_masac_configuration(
     print("[TEST] Enabling test mode for fast PCA fitting...")
     base_env.test_mode = True
     print("[TEST] Test mode enabled! Reachability checks will be skipped.")
-
-    # Fit PCA dimension adapter
     masac_agent.fit_dimension_adapter(two_agent_env, n_samples=500)
-
-    # Set test mode
     masac_agent.set_test_mode(True)
-
-    # Test episodes
     episode_results = []
     timestep_results = []  # NEW: Track timestep-level data
     global_timestep = 0  # NEW: Global timestep counter across all episodes
@@ -193,16 +162,10 @@ def test_masac_configuration(
                 if i not in two_agent_env.base_env.objects_picked
                 and two_agent_env.reshuffle_count_per_cube.get(i, 0) < 2
             ]
-
-            # MASAC selects reshuffling action with action masking
             action_dict = masac_agent.select_action(obs, deterministic=True, valid_cubes=valid_cubes)
-
-            # Skip if no valid action
             if action_dict is None:
                 print(f"  [WARNING] No valid cubes to reshuffle, skipping step")
                 break
-
-            # Convert dictionary action to integer action for TwoAgentEnv
             action_int = two_agent_env.reshuffle_action_space.encode_action(
                 cube_idx=action_dict['cube_idx'],
                 grid_x=action_dict['target_grid_x'],
@@ -241,8 +204,6 @@ def test_masac_configuration(
             timestep_results.append(timestep_data)
 
             obs = next_obs
-
-        # Log episode results with success ratio and metadata
         cubes_picked_count = len(two_agent_env.base_env.objects_picked)
         success_ratio = cubes_picked_count / num_cubes  # Success ratio (e.g., 8/9 = 0.89)
 
@@ -268,8 +229,6 @@ def test_masac_configuration(
               f"Reshuffles={reshuffles_performed}, "
               f"Distance={two_agent_env.total_distance_reduced:.3f}m, "
               f"Cubes={len(two_agent_env.base_env.objects_picked)}/{num_cubes}")
-
-    # Save results (both episode and timestep level)
     save_results(
         env_type=env_type,
         grid_size=grid_size,
@@ -292,19 +251,6 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
                  seed: int = None, run_id: int = 1):
     """
     Save test results to CSV and JSON with MAPPO-style formatting
-
-    Args:
-        env_type: Environment type (e.g., 'astar', 'rrt_viz')
-        grid_size: Grid size
-        num_cubes: Number of cubes
-        episode_results: List of episode-level results
-        timestep_results: List of timestep-level results
-        log_dir: Directory to save logs
-        algorithm: Algorithm name (e.g., 'MASAC', 'MAPPO')
-        scenario: Scenario name (e.g., 'grid4_cubes9_astar')
-        planner: Planner name (e.g., 'A*', 'RRT Viz')
-        seed: Random seed
-        run_id: Run identifier
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_path = Path(log_dir)
@@ -312,7 +258,7 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
 
     # Save Episode-level CSV
     if not episode_results:
-        print("⚠️  Warning: No episode results to save!")
+        print("  Warning: No episode results to save!")
         return
 
     csv_filename = f"masac_{env_type}_grid{grid_size}_cubes{num_cubes}_{timestamp}_episode_log.csv"
@@ -323,9 +269,9 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
             writer = csv.DictWriter(f, fieldnames=episode_results[0].keys())
             writer.writeheader()
             writer.writerows(episode_results)
-        print(f"✅ Saved episode CSV: {csv_path.name}")
+        print(f" Saved episode CSV: {csv_path.name}")
     except Exception as e:
-        print(f"❌ Error saving episode CSV: {e}")
+        print(f"Error saving episode CSV: {e}")
 
     # Save Timestep-level CSV
     if timestep_results:
@@ -337,13 +283,12 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
                 writer = csv.DictWriter(f, fieldnames=timestep_results[0].keys())
                 writer.writeheader()
                 writer.writerows(timestep_results)
-            print(f"✅ Saved timestep CSV: {timestep_csv_path.name}")
+            print(f" Saved timestep CSV: {timestep_csv_path.name}")
         except Exception as e:
-            print(f"❌ Error saving timestep CSV: {e}")
+            print(f" Error saving timestep CSV: {e}")
     else:
-        print("⚠️  Warning: No timestep results to save!")
+        print("  Warning: No timestep results to save!")
 
-    # Calculate statistics with variance
     rewards = [r['total_reward'] for r in episode_results]
     reshuffles = [r['reshuffles_performed'] for r in episode_results]
     distances = [r['total_distance_reduced'] for r in episode_results]
@@ -351,12 +296,8 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
     episode_lengths = [r['episode_length'] for r in episode_results]
     cubes_picked = [r['cubes_picked'] for r in episode_results]
     success_ratios = [r['success'] for r in episode_results]
-
-    # Calculate average success rate (now it's a ratio, not boolean)
     avg_success_ratio = np.mean(success_ratios) if success_ratios else 0.0
     success_rate_pct = avg_success_ratio * 100  # Convert to percentage
-
-    # Save summary JSON with mean, std, variance, median, min, max (MAPPO-style)
     summary = {
         # Metadata
         'algorithm': algorithm,
@@ -388,7 +329,6 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
             'std': float(np.std([float(s) * 100 for s in success_ratios])),
         },
 
-        # Reshuffles statistics
         'reshuffles': {
             'mean': float(np.mean(reshuffles)),
             'std': float(np.std(reshuffles)),
@@ -397,8 +337,6 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
             'min': int(np.min(reshuffles)),
             'max': int(np.max(reshuffles)),
         },
-
-        # Distance reduced statistics (meters)
         'distance_reduced_m': {
             'mean': float(np.mean(distances)),
             'std': float(np.std(distances)),
@@ -408,7 +346,6 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
             'max': float(np.max(distances)),
         },
 
-        # Time saved statistics (seconds)
         'time_saved_s': {
             'mean': float(np.mean(times)),
             'std': float(np.std(times)),
@@ -453,9 +390,9 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
     try:
         with open(json_path, 'w') as f:
             json.dump(summary, f, indent=2)
-        print(f"✅ Saved JSON summary: {json_path.name}")
+        print(f" Saved JSON summary: {json_path.name}")
     except Exception as e:
-        print(f"❌ Error saving JSON summary: {e}")
+        print(f" Error saving JSON summary: {e}")
         import traceback
         traceback.print_exc()
 
@@ -470,7 +407,7 @@ def main():
     parser.add_argument('--run_id', type=int, default=1, help='Run identifier for multiple runs')
     args = parser.parse_args()
 
-    # Only Grid 4x4, 9 cubes (RRT Viz and A*)
+
     configurations = [
         ('rrt_viz', 4, 9),
         ('astar', 4, 9),
@@ -502,11 +439,11 @@ def main():
                 all_results[config_key] = results
 
         except Exception as e:
-            print(f"❌ Error testing {env_type} grid{grid_size} cubes{num_cubes}: {e}")
+            print(f" Error testing {env_type} grid{grid_size} cubes{num_cubes}: {e}")
             import traceback
             traceback.print_exc()
 
-    # Print summary
+
     print(f"\n{'='*80}")
     print("MASAC TESTING COMPLETE - Grid 4x4, 9 Cubes (A* & RRT Viz)")
     print(f"{'='*80}")
