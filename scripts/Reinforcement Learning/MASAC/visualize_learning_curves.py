@@ -1,13 +1,3 @@
-"""
-Create MAPPO-style learning curves with confidence intervals
-
-This script creates learning curves similar to the MAPPO paper, showing
-timesteps vs episode rewards with shaded confidence intervals across multiple seeds.
-
-Usage:
-    python visualize_learning_curves.py --log_dir logs/multi_seed_20250116_120000
-"""
-
 import argparse
 import pandas as pd
 import numpy as np
@@ -22,7 +12,7 @@ def load_timestep_data(log_dir: Path):
     timestep_files = list(log_dir.glob("*_timestep_log.csv"))
     
     if not timestep_files:
-        print(f"⚠️  No timestep files found in {log_dir}")
+        print(f"  No timestep files found in {log_dir}")
         return None
     
     # Load and concatenate all timestep files
@@ -32,7 +22,7 @@ def load_timestep_data(log_dir: Path):
         dfs.append(df)
     
     combined_df = pd.concat(dfs, ignore_index=True)
-    print(f"✅ Loaded {len(timestep_files)} timestep files ({len(combined_df)} total timesteps)")
+    print(f" Loaded {len(timestep_files)} timestep files ({len(combined_df)} total timesteps)")
     
     return combined_df
 
@@ -41,25 +31,14 @@ def create_learning_curve(df: pd.DataFrame, metric: str = 'cumulative_reward',
                          window_size: int = 100, save_path: Path = None):
     """
     Create MAPPO-style learning curve with confidence intervals
-    
-    Args:
-        df: DataFrame with timestep data
-        metric: Metric to plot ('cumulative_reward', 'reward', etc.)
-        window_size: Window size for smoothing
-        save_path: Path to save the plot
     """
-    # Set style
     sns.set_style("whitegrid")
     plt.figure(figsize=(10, 6))
-    
-    # Get unique scenarios and seeds
     scenarios = df['scenario'].unique()
     
     for scenario in scenarios:
         scenario_df = df[df['scenario'] == scenario]
         seeds = scenario_df['seed'].unique()
-        
-        # Calculate smoothed values for each seed
         smoothed_data = []
         for seed in seeds:
             seed_df = scenario_df[seed_df['seed'] == seed].sort_values('global_timestep')
@@ -72,26 +51,19 @@ def create_learning_curve(df: pd.DataFrame, metric: str = 'cumulative_reward',
                 'smoothed_metric': smoothed.values
             })
         
-        # Align timesteps and calculate mean/std across seeds
         if smoothed_data:
-            # Find common timestep range
             min_timesteps = min(len(d['global_timestep']) for d in smoothed_data)
             
-            # Truncate all to same length
             timesteps = smoothed_data[0]['global_timestep'][:min_timesteps]
             values = np.array([d['smoothed_metric'][:min_timesteps] for d in smoothed_data])
             
-            # Calculate mean and std
             mean_values = np.mean(values, axis=0)
             std_values = np.std(values, axis=0)
             
-            # Get planner name for label
             planner = scenario_df['planner'].iloc[0]
             
-            # Plot mean line
             plt.plot(timesteps, mean_values, label=planner, linewidth=2)
-            
-            # Plot confidence interval (mean ± std)
+    
             plt.fill_between(timesteps, 
                            mean_values - std_values, 
                            mean_values + std_values, 
@@ -106,7 +78,7 @@ def create_learning_curve(df: pd.DataFrame, metric: str = 'cumulative_reward',
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"✅ Saved learning curve: {save_path}")
+        print(f" Saved learning curve: {save_path}")
     
     plt.show()
 
@@ -136,13 +108,10 @@ def create_comparison_plots(df: pd.DataFrame, save_dir: Path):
             
             # Group by timestep and calculate mean/std
             grouped = scenario_df.groupby('global_timestep')[metric].agg(['mean', 'std']).reset_index()
-            
-            # Apply smoothing
+        
             window = 100
             grouped['mean_smooth'] = grouped['mean'].rolling(window=window, min_periods=1).mean()
             grouped['std_smooth'] = grouped['std'].rolling(window=window, min_periods=1).mean()
-            
-            # Plot
             plt.plot(grouped['global_timestep'], grouped['mean_smooth'], label=planner, linewidth=2)
             plt.fill_between(grouped['global_timestep'],
                            grouped['mean_smooth'] - grouped['std_smooth'],
@@ -158,7 +127,7 @@ def create_comparison_plots(df: pd.DataFrame, save_dir: Path):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.close()
         
-        print(f"✅ Saved {metric} plot: {save_path}")
+        print(f" Saved {metric} plot: {save_path}")
 
 
 def main():
@@ -174,7 +143,7 @@ def main():
     log_dir = Path(args.log_dir)
     
     if not log_dir.exists():
-        print(f"❌ Log directory not found: {log_dir}")
+        print(f" Log directory not found: {log_dir}")
         return
     
     print(f"\n{'='*80}")
@@ -189,18 +158,12 @@ def main():
     df = load_timestep_data(log_dir)
     
     if df is None or df.empty:
-        print("❌ No data to visualize")
+        print(" No data to visualize")
         return
-    
-    # Create plots directory
     plots_dir = log_dir / "plots"
     plots_dir.mkdir(exist_ok=True)
-    
-    # Create main learning curve
     save_path = plots_dir / f"learning_curve_{args.metric}.png"
     create_learning_curve(df, metric=args.metric, window_size=args.window, save_path=save_path)
-    
-    # Create comparison plots for all metrics
     create_comparison_plots(df, plots_dir)
     
     print(f"\n{'='*80}")
