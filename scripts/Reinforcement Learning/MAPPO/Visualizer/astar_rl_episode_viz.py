@@ -1,12 +1,3 @@
-"""
-MAPPO Two-Agent + A* Episode Visualizer
-
-Visualizes MAPPO two-agent system:
-- Agent 1 (DDQN): Selects cubes to pick
-- Agent 2 (MAPPO): Decides when/how to reshuffle cubes
-Shows one complete episode with curved paths, reshuffling events, and interactive charts.
-"""
-
 import os
 import sys
 import argparse
@@ -15,7 +6,7 @@ import time
 from typing import Optional, List, Tuple
 from collections import deque
 
-# Suppress warnings
+
 warnings.filterwarnings('ignore', category=UserWarning)
 warnings.filterwarnings('ignore', category=FutureWarning)
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "1"
@@ -28,20 +19,15 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.patches import FancyArrowPatch
 import seaborn as sns
-
-# Add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
-
-# Add MAPPO module to path
 mappo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if mappo_root not in sys.path:
     sys.path.insert(0, mappo_root)
 
-# Import Catmull-Rom spline from local utils
-from src.utils.catmull_rom_spline_path import catmull_rom_spline
 
+from src.utils.catmull_rom_spline_path import catmull_rom_spline
 from src.rl.object_selection_env_astar import ObjectSelectionEnvAStar
 from src.rl.path_estimators import Node
 from sb3_contrib import MaskablePPO
@@ -49,27 +35,24 @@ from sb3_contrib.common.wrappers import ActionMasker
 from stable_baselines3.common.vec_env import DummyVecEnv
 import torch
 from src.rl.doubleDQN import DoubleDQNAgent
-
-# Import MAPPO modules
 from algorithms.mappo_policy import MAPPOPolicy
 from envs.two_agent_env import TwoAgentEnv
 from envs.reshuffling_decision import ReshufflingReason
 
-# Colors
 BG_COLOR = (20, 20, 30)
 GRID_COLOR = (60, 60, 80)
 CUBE_COLOR = (100, 200, 100)
 OBSTACLE_COLOR = (200, 50, 50)
 AGENT_COLOR = (100, 150, 255)
 PATH_COLOR = (255, 200, 0)
-SELECTED_BORDER_COLOR = (0, 150, 255)  # Blue border for picked cubes
-RESHUFFLE_BORDER_COLOR = (255, 255, 0)  # Yellow border for reshuffled cubes
+SELECTED_BORDER_COLOR = (0, 150, 255)  
+RESHUFFLE_BORDER_COLOR = (255, 255, 0) 
 TEXT_COLOR = (220, 220, 220)
-HEADER_COLOR = (100, 200, 255)  # Bright blue for headers
-LABEL_COLOR = (180, 180, 200)   # Light gray for labels
-VALUE_COLOR = (255, 255, 255)   # White for values
-BOX_COLOR = (40, 40, 50)        # Dark box background
-BOX_BORDER_COLOR = (80, 80, 100)  # Box border
+HEADER_COLOR = (100, 200, 255) 
+LABEL_COLOR = (180, 180, 200)  
+VALUE_COLOR = (255, 255, 255)  
+BOX_COLOR = (40, 40, 50)       
+BOX_BORDER_COLOR = (80, 80, 100)  
 
 
 def parse_args():
@@ -88,13 +71,6 @@ def parse_args():
 def cubic_spline(points: List[Tuple[float, float]], num_points: int = 100) -> List[Tuple[float, float]]:
     """
     Generate smooth curve through points using Cubic Spline interpolation.
-
-    Parameters:
-        points: List of (x, y) waypoints from A* path
-        num_points: Number of interpolated points for smooth curve
-
-    Returns:
-        List of interpolated (x, y) points forming a smooth curve
     """
     if len(points) < 2:
         return points
@@ -127,42 +103,32 @@ def cubic_spline(points: List[Tuple[float, float]], num_points: int = 100) -> Li
         return points
 
     t = np.linspace(0, total_length, num_points)
-
-    # Cubic spline interpolation for x and y separately
     def spline_1d(s_list, val_list, t_vals):
         """
         1D cubic spline interpolation.
-        Solves for cubic polynomial coefficients: f(s) = a + b*ds + c*ds^2 + d*ds^3
+    
         """
         num = len(s_list)
         a = val_list.copy()
         b, c, d = [], [], []
         h = np.diff(s_list)
 
-        # Build tridiagonal matrix for natural cubic spline
         A = np.zeros((num, num))
         B = np.zeros(num)
 
-        # Natural boundary conditions: second derivative = 0 at endpoints
+     
         A[0, 0] = 1.0
         A[num - 1, num - 1] = 1.0
-
-        # Interior points: continuity of second derivative
         for i in range(1, num - 1):
             A[i, i - 1] = h[i - 1]
             A[i, i] = 2.0 * (h[i - 1] + h[i])
             A[i, i + 1] = h[i]
             B[i] = 3.0 * ((a[i + 1] - a[i]) / h[i] - (a[i] - a[i - 1]) / h[i - 1])
 
-        # Solve for c coefficients
         c = np.linalg.solve(A, B).tolist()
-
-        # Calculate b and d coefficients
         for i in range(num - 1):
             d.append((c[i + 1] - c[i]) / (3.0 * h[i]))
             b.append((a[i + 1] - a[i]) / h[i] - h[i] * (c[i + 1] + 2.0 * c[i]) / 3.0)
-
-        # Evaluate spline at requested parameter values
         result = []
         for it in t_vals:
             if it <= s_list[0]:
@@ -180,11 +146,8 @@ def cubic_spline(points: List[Tuple[float, float]], num_points: int = 100) -> Li
 
         return result
 
-    # Interpolate x and y coordinates separately
     path_x = spline_1d(s, x_list, t)
     path_y = spline_1d(s, y_list, t)
-
-    # Combine into list of (x, y) points
     curve_points = [(int(x), int(y)) for x, y in zip(path_x, path_y)]
 
     return curve_points
@@ -200,8 +163,6 @@ class EpisodeData:
         self.obstacle_positions = []
         self.ee_start_position = None
         self.picked_cubes = []
-
-        # Reshuffling tracking
         self.reshuffles = []  # List of reshuffle events
         self.reshuffle_rewards = []  # Reshuffle rewards per step
         self.pick_rewards = []  # Pick rewards per step
@@ -250,7 +211,6 @@ class AStarRLEpisodeVisualizer:
                  mappo_model_path: Optional[str] = None,
                  window_width: int = 1600, window_height: int = 900, initial_fps: int = 30):
         """Initialize visualizer"""
-        # Configuration
         self.grid_size = grid_size
         self.num_cubes = num_cubes
         self.window_width = window_width
@@ -258,14 +218,10 @@ class AStarRLEpisodeVisualizer:
         self.fps = initial_fps
         self.ddqn_model_path = ddqn_model_path
         self.mappo_model_path = mappo_model_path
-
-        # Initialize pygame
         pygame.init()
         self.screen = pygame.display.set_mode((window_width, window_height), pygame.RESIZABLE)
         pygame.display.set_caption("MAPPO Two-Agent + A* Motion Planning")
         self.clock = pygame.time.Clock()
-
-        # Use Trebuchet MS font
         try:
             self.font_header = pygame.font.SysFont("trebuchetms", 20, bold=True)
             self.font_large = pygame.font.SysFont("trebuchetms", 16, bold=True)
@@ -277,18 +233,12 @@ class AStarRLEpisodeVisualizer:
             self.font_large = pygame.font.Font(None, 20)
             self.font_medium = pygame.font.Font(None, 16)
             self.font_small = pygame.font.Font(None, 14)
-
-        # Initialize models
         self.ddqn_agent = None
         self.mappo_agent = None
         model_max_objects = None
         model_grid_size = grid_size
-
-        # Load DDQN model metadata if provided
         if ddqn_model_path and os.path.exists(ddqn_model_path):
             print(f"[DDQN] Loading DDQN model from: {ddqn_model_path}")
-
-            # Try to load metadata JSON file
             if "_step_" in ddqn_model_path:
                 base_name = ddqn_model_path.rsplit("_step_", 1)[0]
                 metadata_path = base_name + "_metadata.json"
@@ -315,9 +265,6 @@ class AStarRLEpisodeVisualizer:
             else:
                 print(f"[WARNING] DDQN metadata file not found: {metadata_path}")
 
-
-
-        # Create base environment (A* for Agent 1)
         max_objects = model_max_objects if model_max_objects else num_cubes
         print(f"[ENV] Creating base A* environment with max_objects={max_objects}, num_cubes={num_cubes}, grid={grid_size}x{grid_size}")
 
@@ -330,8 +277,6 @@ class AStarRLEpisodeVisualizer:
             dynamic_obstacles=False,
             training_grid_size=grid_size
         )
-
-        # Wrap in TwoAgentEnv for MAPPO
         print(f"[ENV] Wrapping in TwoAgentEnv for MAPPO two-agent system")
         self.env = TwoAgentEnv(
             base_env=base_env,
@@ -341,11 +286,8 @@ class AStarRLEpisodeVisualizer:
             reshuffle_reward_scale=1.0
         )
 
-        # Keep reference to base environment for visualization
         self.base_env = base_env
         self.wrapped_env = self.env  # For compatibility
-
-        # Load Agent 1 (DDQN) model
         if ddqn_model_path and os.path.exists(ddqn_model_path):
             try:
                 print(f"[DDQN] Loading DDQN model...")
@@ -370,8 +312,6 @@ class AStarRLEpisodeVisualizer:
                 print(f"[ERROR] Failed to load DDQN model: {e}")
                 print(f"[INFO] Agent 1 will use random actions")
                 self.ddqn_agent = None
-
-        # Load Agent 2 (MAPPO) model
         if mappo_model_path and os.path.exists(mappo_model_path):
             try:
                 print(f"[MAPPO] Loading MAPPO model from: {mappo_model_path}")
@@ -395,29 +335,18 @@ class AStarRLEpisodeVisualizer:
                 print(f"[INFO] Agent 2 will use random actions")
                 self.mappo_agent = None
 
-        # Print model status
         if not self.ddqn_agent and not self.mappo_agent:
             print(f"[INFO] Running with random actions for both agents")
-
-        # Episode state
         self.current_episode = None
         self.episode_step = 0
         self.episode_count = 0
         self.episode_history = deque(maxlen=50)
         self.chart_fig = None
-
-        # Cache for graph surfaces to avoid regenerating every frame
         self.cached_reward_graph = None
         self.cached_reward_history_len = 0
-
-        # Cache for arrow calculations to avoid recalculating every frame
         self.cached_arrow_data = None
         self.cached_path_progress = -1.0
-
-        # Accumulated paths for A* graph (all paths from all steps in current episode)
-        self.accumulated_paths = []  # List of (path, explored_nodes, target_pos) tuples
-
-        # Cache for A* graph to avoid regenerating every frame
+        self.accumulated_paths = []  
         self.cached_astar_graph = None
         self.cached_astar_progress = -1.0
         self.cached_astar_phase = -1
@@ -433,11 +362,6 @@ class AStarRLEpisodeVisualizer:
         self.paused = True
         self.playback_speed = 1.0
         self.auto_advance = True
-
-        # Animation state with phases
-        # Phase 1: Show selected cube (blue border)
-        # Phase 2: Draw path animation (path grows towards target)
-        # Phase 3: Cube disappears, wait before next step
         self.animation_phase = 0  # 0=idle, 1=selection, 2=path_animation, 3=post_animation_delay
         self.phase_timer = 0
         self.selection_delay = 30  # frames to show selected cube before path
@@ -445,7 +369,6 @@ class AStarRLEpisodeVisualizer:
         self.path_animation_duration = 60  # frames for path drawing animation (reduced from 90 for faster movement)
         self.post_animation_delay = 30  # frames to wait after path before cube disappears
 
-        # Reward components for current step (calculated from observation values)
         self.current_reward_components = {
             'r_total': 0.0,
             'r_path': 0.0,           # Path/distance reward (max 5.0)
@@ -455,7 +378,7 @@ class AStarRLEpisodeVisualizer:
             'r_clearance': 0.0       # Path clearance reward (max 2.0)
         }
 
-        # Current observation components
+
         self.current_obs_components = {
             'dist_to_ee': 0.0,
             'dist_to_container': 0.0,
@@ -467,46 +390,31 @@ class AStarRLEpisodeVisualizer:
             'dist_to_origin': 0.0
         }
 
-        # Reward history for spike graph
         self.reward_history = []
-
-        # Episode timer
         self.episode_start_time = 0
         self.episode_elapsed_time = 0  # in seconds
         self.timer_started = False  # Flag to track if timer has started
-
-        # Generate first episode
         self.generate_new_episode()
 
     def generate_new_episode(self):
         """Generate a new episode by running the two-agent system"""
-        # Reset environment
+      
         agent2_obs = self.env.reset()
-
-        # Reset episode timer (will start when Step 1 begins)
         self.episode_start_time = 0
         self.episode_elapsed_time = 0
         self.timer_started = False
-
-        # Clear accumulated paths for new episode
         self.accumulated_paths = []
-
-        # Generate random obstacles (1-3, but only if there's room)
         grid_capacity = self.grid_size * self.grid_size
         available_cells = grid_capacity - self.num_cubes - 1  # -1 for EE home cell
         max_obstacles = max(0, min(3, available_cells))
         min_obstacles = 1 if max_obstacles > 0 else 0
         num_obstacles = np.random.randint(min_obstacles, max_obstacles + 1) if max_obstacles > 0 else 0
         self._add_random_obstacles(num_obstacles)
-
-        # Create episode data
         episode = EpisodeData()
         episode.cube_positions = self.base_env.object_positions[:self.base_env.total_objects].copy()
         episode.obstacle_positions = [self.base_env.astar_estimator._grid_to_world(ox, oy)
                                      for ox, oy in self.static_obstacles]
         episode.ee_start_position = self.base_env.ee_position.copy()
-
-        # Run episode
         done = False
         step = 0
         successful_picks = 0
@@ -538,15 +446,8 @@ class AStarRLEpisodeVisualizer:
             else:
                 # Random action
                 agent2_action = np.random.randint(0, self.env.action_space.n)
-
-            # Update A* grid with current unpicked cubes as obstacles
-            # (exclude the target cube we're planning to pick)
             self._update_astar_grid_for_planning(agent1_action)
-
-            # Get A* path before taking action
             path = self._get_astar_path(agent1_action)
-
-            # Track success/failure based on A* result
             if path and len(path) > 0:
                 successful_picks += 1
                 print(f"  Step {step+1}: Cube {agent1_action}, Path points: {len(path)} ✓")
@@ -554,21 +455,15 @@ class AStarRLEpisodeVisualizer:
                 failed_picks += 1
                 print(f"  Step {step+1}: Cube {agent1_action}, Path points: 0 ✗ A* FAILED")
 
-            # Calculate metrics
             path_length = self._calculate_path_length(path) if path else 999.0
             obstacle_proximity = self._calculate_obstacle_proximity(agent1_action)
             dist_to_ee = np.linalg.norm(self.base_env.object_positions[agent1_action][:2] - self.base_env.ee_position[:2])
-            # Reachability based on distance (0.3m to 0.9m range, matches environment)
             reachability = 1.0 if (0.3 <= dist_to_ee <= 0.9) else 0.0
             path_clearance = self._calculate_path_clearance(path) if path else 0.0
             dist_to_container = 0.5
-
-            # Take action (both agents)
             next_agent2_obs, reward, terminated, truncated, info = self.env.step(agent1_action, agent2_action)
             done = terminated or truncated
             agent2_obs = next_agent2_obs
-
-            # Extract reshuffling info
             reshuffle_info = None
             reshuffle_reward = 0.0
             pick_reward = 0.0
@@ -586,10 +481,7 @@ class AStarRLEpisodeVisualizer:
                     }
                     print(f"    → Reshuffle: Cube {last_reshuffle['cube_idx']} (Priority {last_reshuffle['priority']}, {last_reshuffle['reason']})")
 
-            # NOTE: EE position stays at home position (not updated)
-            # Path planning always starts from same EE position for all picks
 
-            # Record step
             episode.add_step(agent1_action, path, reward, path_length, obstacle_proximity,
                            reachability, path_clearance, dist_to_ee, dist_to_container,
                            reshuffle_info, reshuffle_reward, pick_reward)
@@ -611,11 +503,7 @@ class AStarRLEpisodeVisualizer:
 
         if num_obstacles == 0:
             return
-
-        # Get EE home position to avoid
         ee_grid_x, ee_grid_y = self.base_env.astar_estimator._world_to_grid(self.base_env.ee_position[:2])
-
-        # Get cube positions to avoid
         cube_cells = set()
         cube_cells.add((ee_grid_x, ee_grid_y))  # Exclude EE home cell
 
@@ -624,7 +512,6 @@ class AStarRLEpisodeVisualizer:
             grid_col, grid_row = self.base_env.astar_estimator._world_to_grid(pos[:2])
             cube_cells.add((grid_col, grid_row))
 
-        # Get all empty cells
         empty_cells = []
         for grid_x in range(self.grid_size):
             for grid_y in range(self.grid_size):
@@ -642,27 +529,15 @@ class AStarRLEpisodeVisualizer:
     def _update_astar_grid_for_planning(self, target_cube_idx: int):
         """
         Update A* occupancy grid with current obstacles.
-
-        Obstacles include:
-        1. Static obstacles (randomly placed)
-        2. Unpicked cubes (EXCEPT the target cube we're planning to pick)
-
-        Args:
-            target_cube_idx: Index of the cube we're planning to pick (not treated as obstacle)
         """
-        # Get static obstacle positions
         obstacle_positions = []
         for grid_x, grid_y in self.static_obstacles:
             world_pos = self.base_env.astar_estimator._grid_to_world(grid_x, grid_y)
             obstacle_positions.append(np.array([world_pos[0], world_pos[1], 0.0]))
-
-        # Get unpicked cube positions (excluding target cube)
         unpicked_cube_positions = []
         for i in range(self.base_env.total_objects):
             if i not in self.base_env.objects_picked and i != target_cube_idx:
                 unpicked_cube_positions.append(self.base_env.object_positions[i])
-
-        # Update A* grid
         self.base_env.astar_estimator.update_occupancy_grid(
             object_positions=unpicked_cube_positions,
             obstacle_positions=obstacle_positions
@@ -671,8 +546,6 @@ class AStarRLEpisodeVisualizer:
     def _greedy_action(self) -> int:
         """
         Greedy baseline: pick closest unpicked cube using A* path length.
-
-        This ensures we pick cubes that are actually reachable, not just physically close.
         """
         min_path_length = float('inf')
         best_action = 0
@@ -700,16 +573,9 @@ class AStarRLEpisodeVisualizer:
         ee_grid = self.base_env.astar_estimator._world_to_grid(self.base_env.ee_position[:2])
         cube_pos = self.base_env.object_positions[cube_idx]
         goal_grid = self.base_env.astar_estimator._world_to_grid(cube_pos[:2])
-
-        # Check if start == goal
         if ee_grid == goal_grid:
             return []  # Return empty list
-
-        # Run A* search (using PythonRobotics planning method)
         rx, ry = self.base_env.astar_estimator.planning(ee_grid[0], ee_grid[1], goal_grid[0], goal_grid[1])
-
-        # Convert to list of tuples
-        # NOTE: PythonRobotics A* returns path from GOAL to START, so we need to REVERSE it
         if rx is None or ry is None:
             return []  # No path found
         else:
@@ -725,12 +591,8 @@ class AStarRLEpisodeVisualizer:
         ee_grid = self.base_env.astar_estimator._world_to_grid(self.base_env.ee_position[:2])
         cube_pos = self.base_env.object_positions[cube_idx]
         goal_grid = self.base_env.astar_estimator._world_to_grid(cube_pos[:2])
-
-        # Check if start == goal
         if ee_grid == goal_grid:
             return [], []  # Return empty lists
-
-        # Run A* search and get closed_set (explored nodes)
         start_node = Node(ee_grid[0], ee_grid[1], 0.0, -1)
         goal_node = Node(goal_grid[0], goal_grid[1], 0.0, -1)
 
@@ -772,11 +634,7 @@ class AStarRLEpisodeVisualizer:
                 else:
                     if open_set[n_id].cost > node.cost:
                         open_set[n_id] = node
-
-        # Extract path
         rx, ry = self.base_env.astar_estimator.calc_final_path(goal_node, closed_set)
-
-        # Extract explored nodes
         explored = [(closed_set[key].x, closed_set[key].y) for key in closed_set]
 
         if rx is None or ry is None:
@@ -832,51 +690,27 @@ class AStarRLEpisodeVisualizer:
                                     reachability, path_clearance, dist_to_ee):
         """
         Calculate individual reward components from observation values.
-        Matches the reward calculation in ObjectSelectionEnvAStar._calculate_reward()
-
-        Args:
-            path_length: A* path length in meters
-            dist_to_container: Distance to container in meters
-            obstacle_proximity: Obstacle score (0.0 = far, 1.0 = very close)
-            reachability: Reachability flag (1.0 = reachable, 0.0 = unreachable)
-            path_clearance: Path clearance score (0.0 = blocked, 1.0 = clear)
-            dist_to_ee: Euclidean distance to EE in meters
-
-        Returns:
-            Dictionary with individual reward components
+    
         """
         components = {}
-
-        # 1. Path length reward (max 5.0)
-        # Check if A* planning failed (path_length >= 2.0 × Euclidean)
-        euclidean_distance = dist_to_ee
-        planning_failed = (path_length >= 2.0 * euclidean_distance)
-
-        # Normalize by typical path length (0.3m to 0.9m)
-        normalized_path_length = (path_length - 0.3) / 0.6
-        normalized_path_length = np.clip(normalized_path_length, 0.0, 1.0)
-        path_reward = 5.0 * (1.0 - normalized_path_length)
-
-        # Subtract failure penalty if planning failed
         if planning_failed:
             path_reward -= 5.0
 
         components['r_path'] = path_reward
 
-        # 2. Container distance reward (max 3.0)
         container_reward = 3.0 * np.exp(-dist_to_container)
         components['r_container'] = container_reward
 
-        # 3. Obstacle proximity reward (max 3.0)
+
         obstacle_reward = 3.0 * (1.0 - obstacle_proximity)
         components['r_obstacle'] = obstacle_reward
 
-        # 4. Reachability penalty (0.0 or -10.0)
+
         # reachability flag: 1.0 = reachable (0.3m to 0.9m), 0.0 = unreachable
         reachability_penalty = 0.0 if reachability >= 0.5 else -10.0
         components['r_reachability'] = reachability_penalty
 
-        # 5. Path clearance reward (max 2.0)
+  
         clearance_reward = 2.0 * path_clearance
         components['r_clearance'] = clearance_reward
 
@@ -890,36 +724,22 @@ class AStarRLEpisodeVisualizer:
             surf.fill(BOX_COLOR)
             return surf
 
-        # Check if we can use cached graph (only regenerate when reward history changes)
+    
         if (self.cached_reward_graph is not None and
             self.cached_reward_history_len == len(self.reward_history)):
             return self.cached_reward_graph
-
-        # Create matplotlib figure with adjusted layout to prevent label cutoff
         fig, ax = plt.subplots(figsize=(width/100, height/100), dpi=100, facecolor='#282828')
         ax.set_facecolor('#282828')
-
-        # Create gradient area chart
         steps = np.array(range(1, len(self.reward_history) + 1))
         rewards = np.array(self.reward_history)
-
-        # Normalize rewards to 0-1 range for colormap
         min_reward = min(rewards)
-
-        # Shift rewards to be positive for gradient effect
         rewards_shifted = rewards - min_reward + 0.1  # Add small offset to avoid zero
-
-        # Choose colormap - Blues for a nice gradient effect
         cmap = plt.get_cmap('Blues')
         n_levels = 60  # Reduced from 80 for better performance
-
-        # Create layered gradient fill
         for i in range(n_levels):
             alpha_level = (i + 1) / n_levels
             y_level = rewards_shifted * alpha_level
             ax.fill_between(steps, 0, y_level, color=cmap(alpha_level), alpha=0.05)
-
-        # Styling - NO GRID
         ax.set_xlabel('Step', color='white', fontsize=7)
         ax.set_ylabel('Reward', color='white', fontsize=7)
         ax.set_title('Reward Vs Step', color='#64C8FF', fontsize=9, fontweight='bold')
@@ -929,17 +749,11 @@ class AStarRLEpisodeVisualizer:
         ax.spines['left'].set_color('white')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-
-        # Format tick labels as integers
         from matplotlib.ticker import MaxNLocator
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-
-        # Adjust y-axis to show actual reward values (not shifted) as integers
         y_ticks = ax.get_yticks()
         ax.set_yticklabels([f'{int(y + min_reward - 0.1)}' for y in y_ticks])
-
-        # Set x-axis to start from 1 (steps start from 1, but xlim starts from 0.5 to fill from y-axis)
         ax.set_xlim(0.5, len(self.reward_history) + 0.5)
 
         # Adjust layout to prevent label cutoff - more space for title and bottom label
@@ -952,12 +766,8 @@ class AStarRLEpisodeVisualizer:
         # Get the RGBA buffer and convert to RGB
         buf = canvas.buffer_rgba()
         size = canvas.get_width_height()
-
-        # Create surface from RGBA buffer
         surf = pygame.image.frombuffer(buf, size, "RGBA")
         plt.close(fig)
-
-        # Cache the surface
         self.cached_reward_graph = surf
         self.cached_reward_history_len = len(self.reward_history)
 
@@ -977,14 +787,12 @@ class AStarRLEpisodeVisualizer:
                     self.paused = not self.paused
 
                 elif event.key == pygame.K_n:
-                    # Next step
                     if self.episode_step < len(self.current_episode.actions):
                         self.episode_step += 1
                         self.animating = True
                         self.animation_progress = 0.0
 
                 elif event.key == pygame.K_r:
-                    # Reset episode
                     self.episode_step = 0
                     self.animating = False
 
@@ -1034,19 +842,6 @@ class AStarRLEpisodeVisualizer:
         """Draw cubes - only unpicked cubes, selected cube has blue border, reshuffled cube has yellow border"""
         if not self.current_episode:
             return
-
-        # Determine which cubes to hide based on animation phase and step
-        # episode_step tracks how many cubes have been COMPLETED (picked and removed)
-        #
-        # Phase 0 (idle): All completed cubes are hidden
-        # Phase 1 (selection): Show next cube to pick with blue border
-        # Phase 2 (path animation): Show cube with blue border + path
-        # Phase 3 (disappearing): Show cube + path, then both disappear together
-
-        # Hide all cubes that have been completed (picked and removed)
-        picked_cubes = set(self.current_episode.picked_cubes[:self.episode_step])
-
-        # Get EE grid position to avoid drawing cubes at same location
         ee_col, ee_row = self.base_env.astar_estimator._world_to_grid(self.base_env.ee_position[:2])
 
         for i in range(len(self.current_episode.cube_positions)):
@@ -1097,8 +892,6 @@ class AStarRLEpisodeVisualizer:
         """Draw agent (end-effector) at its actual grid cell position"""
         # Get EE grid position from world coordinates (same as used for obstacle exclusion)
         ee_col, ee_row = self.base_env.astar_estimator._world_to_grid(self.base_env.ee_position[:2])
-
-        # Position EE at the CENTER of its grid cell
         agent_x = grid_x + ee_col * cell_size + cell_size // 2
         agent_y = grid_y + ee_row * cell_size + cell_size // 2
 
@@ -1106,8 +899,6 @@ class AStarRLEpisodeVisualizer:
         radius = int(cell_size * 0.3)  # Larger icon to be visible in cell
         pygame.draw.circle(self.screen, AGENT_COLOR, (agent_x, agent_y), radius)
         pygame.draw.circle(self.screen, AGENT_COLOR, (agent_x, agent_y), radius, 2)
-
-        # Draw label
         label = self.font_small.render("EE", True, TEXT_COLOR)
         label_rect = label.get_rect(center=(agent_x, agent_y))
         self.screen.blit(label, label_rect)
