@@ -1,11 +1,3 @@
-"""
-Test MASAC on Isaac Sim RRT configurations (3 configs)
-Uses actual Isaac Sim environment with RRT planner
-
-Usage:
-    C:\isaacsim\python.bat test_masac_isaacsim.py --episodes 5
-"""
-
 import sys
 from pathlib import Path
 import numpy as np
@@ -14,21 +6,15 @@ import csv
 from datetime import datetime
 import argparse
 
-# Add project root to path
+
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(project_root))
-
-# Add MASAC and MAPPO to path
 masac_path = Path(__file__).parent
 sys.path.insert(0, str(masac_path))
 mappo_path = Path(__file__).parent.parent / "MAPPO"
 sys.path.insert(0, str(mappo_path))
-
-# Import Isaac Sim components (must be before other imports)
 from isaacsim import SimulationApp
 simulation_app = SimulationApp({"headless": True})
-
-# Import Isaac Sim modules (using new isaacsim imports)
 from isaacsim.core.api import World
 from isaacsim.core.utils.extensions import get_extension_path_from_name
 from isaacsim.storage.native import get_assets_root_path
@@ -41,7 +27,6 @@ from omni.isaac.manipulators.grippers import ParallelGripper
 from pxr import UsdGeom, UsdPhysics
 import os
 import numpy as np
-
 from src.rl.doubleDQN import DoubleDQNAgent
 from src.rl.object_selection_env_rrt import ObjectSelectionEnvRRT
 from agents.masac_continuous_wrapper import MASACContinuousWrapper
@@ -51,7 +36,7 @@ from envs.two_agent_env import TwoAgentEnv
 class FrankaRRTTrainer:
     """
     Franka controller for RRT-based testing (reachability checks only, no execution).
-    Adapted from MAPPO training script.
+   
     """
 
     def __init__(self, num_cubes=9, training_grid_size=4):
@@ -75,22 +60,14 @@ class FrankaRRTTrainer:
     def setup_scene(self):
         """Setup Isaac Sim scene with Franka and cubes"""
         print("[TRAINER] Setting up scene...")
-
-        # Create world
         self.world = World(stage_units_in_meters=1.0)
-
-        # Add ground plane
         self.world.scene.add_default_ground_plane()
-
-        # Add Franka robot
         assets_root_path = get_assets_root_path()
         franka_prim_path = "/World/Franka"
         franka_usd_path = assets_root_path + "/Isaac/Robots/FrankaRobotics/FrankaPanda/franka.usd"
         robot_prim = add_reference_to_stage(usd_path=franka_usd_path, prim_path=franka_prim_path)
         robot_prim.GetVariantSet("Gripper").SetVariantSelection("AlternateFinger")
         robot_prim.GetVariantSet("Mesh").SetVariantSelection("Quality")
-
-        # Create gripper
         self.gripper = ParallelGripper(
             end_effector_prim_path=f"{franka_prim_path}/panda_rightfinger",
             joint_prim_names=["panda_finger_joint1", "panda_finger_joint2"],
@@ -114,19 +91,11 @@ class FrankaRRTTrainer:
         # Initialize RRT planner
         print("[TRAINER] Initializing RRT planner...")
         self._setup_rrt_planner()
-
-        # Add container
         print("[TRAINER] Adding container...")
         self._setup_container()
-
-        # Spawn cubes
         self._spawn_cubes()
-
-        # Create random obstacles
         print("[TRAINER] Creating random obstacles...")
         self._create_random_obstacles()
-
-        # Reset world
         self.world.reset()
 
         print("[TRAINER] Scene setup complete")
@@ -263,8 +232,6 @@ class FrankaRRTTrainer:
         grid_extent_y = (self.training_grid_size - 1) * cube_spacing
         start_x = grid_center_x - (grid_extent_x / 2.0)
         start_y = grid_center_y - (grid_extent_y / 2.0)
-
-        # Find occupied cells
         occupied_cells = set()
         for row in range(self.training_grid_size):
             for col in range(self.training_grid_size):
@@ -274,21 +241,15 @@ class FrankaRRTTrainer:
                     if np.linalg.norm(cube_pos[:2] - np.array([cell_x, cell_y])) < 0.05:
                         occupied_cells.add((row, col))
                         break
-
-        # Find empty cells
         empty_cells = []
         for row in range(self.training_grid_size):
             for col in range(self.training_grid_size):
                 if (row, col) not in occupied_cells:
                     empty_cells.append((row, col))
-
-        # Select random empty cells for obstacles
         if len(empty_cells) < num_obstacles:
             num_obstacles = len(empty_cells)
 
         selected_cells = np.random.choice(len(empty_cells), size=num_obstacles, replace=False)
-
-        # Create obstacles
         for idx in selected_cells:
             row, col = empty_cells[idx]
             obs_x = start_x + (row * cube_spacing)
@@ -326,13 +287,9 @@ class FrankaRRTTrainer:
         grid_extent_y = (self.training_grid_size - 1) * cube_spacing
         start_x = grid_center_x - (grid_extent_x / 2.0)
         start_y = grid_center_y - (grid_extent_y / 2.0)
-
-        # Select random cells for cubes
         total_cells = self.training_grid_size * self.training_grid_size
         selected_indices = np.random.choice(total_cells, size=self.num_cubes, replace=False)
         selected_cells = set(selected_indices)
-
-        # Update cube positions
         cube_idx = 0
         self.cube_positions = []
         for row in range(self.training_grid_size):
@@ -361,24 +318,19 @@ class FrankaRRTTrainer:
 def create_isaacsim_environment(grid_size: int, num_cubes: int, max_steps: int = 50):
     """
     Create Isaac Sim environment with Franka robot and RRT planner.
-    Uses FrankaRRTTrainer for cube spawning, obstacle registration, and RRT reachability checks.
     """
     print("[ENV] Creating Isaac Sim environment...")
     print(f"[ENV] Grid: {grid_size}x{grid_size}, Cubes: {num_cubes}")
-
-    # Create FrankaRRTTrainer (handles scene setup, cube spawning, RRT initialization)
     trainer = FrankaRRTTrainer(num_cubes=num_cubes, training_grid_size=grid_size)
     trainer.setup_scene()
-
-    # Create environment with FrankaRRTTrainer as controller
     max_objects = grid_size * grid_size
     env = ObjectSelectionEnvRRT(
-        franka_controller=trainer,  # ✅ Pass trainer for RRT reachability checks
+        franka_controller=trainer,  
         max_objects=max_objects,
         max_steps=max_steps,
         num_cubes=num_cubes,
         training_grid_size=grid_size,
-        execute_picks=False,  # ❌ Don't execute actual picks (testing only)
+        execute_picks=False, 
         rrt_planner=trainer.rrt,
         kinematics_solver=trainer.kinematics_solver,
         articulation_kinematics_solver=trainer.articulation_kinematics_solver,
@@ -399,7 +351,7 @@ def load_ddqn_agent(model_path: str, env) -> DoubleDQNAgent:
     )
     agent.load(model_path)
     agent.epsilon = 0.01  # Set to minimum for testing
-    print(f"✅ Loaded DDQN model: {model_path}")
+    print(f" Loaded DDQN model: {model_path}")
     return agent
 
 
@@ -425,7 +377,7 @@ def test_masac_isaacsim_configuration(
     config_key = f"rrt_isaacsim_grid{grid_size}_cubes{num_cubes}"
     
     if config_key not in ddqn_model_mapping:
-        print(f"⚠️  No DDQN model mapping for {config_key}")
+        print(f"  No DDQN model mapping for {config_key}")
         return None
     
     ddqn_model_filename = ddqn_model_mapping[config_key]
@@ -433,7 +385,7 @@ def test_masac_isaacsim_configuration(
     ddqn_model_path = ddqn_models_dir / ddqn_model_filename
     
     if not ddqn_model_path.exists():
-        print(f"⚠️  DDQN model not found: {ddqn_model_path}")
+        print(f" DDQN model not found: {ddqn_model_path}")
         return None
     
     # Create Isaac Sim environment with RRT planner
@@ -443,14 +395,8 @@ def test_masac_isaacsim_configuration(
         num_cubes=num_cubes,
         max_steps=50
     )
-    
-    # Load DDQN agent
     ddqn_agent = load_ddqn_agent(str(ddqn_model_path), base_env)
-    
-    # Calculate Agent 2 observation dimension
     agent2_state_dim = (num_cubes * 3) + 3 + num_cubes + (grid_size * grid_size) + 10
-
-    # Create MASAC wrapper with dimension adapter
     pretrained_path = project_root / "scripts" / "Reinforcement Learning" / "MASAC" / "pretrained_models"
     cube_spacing = 0.13 if grid_size > 3 else 0.15  # Match DDQN training spacing
     
@@ -464,8 +410,6 @@ def test_masac_isaacsim_configuration(
         memory_size=10000,
         batch_size=64
     )
-    
-    # Create two-agent environment
     two_agent_env = TwoAgentEnv(
         base_env=base_env,
         ddqn_agent=ddqn_agent,
@@ -476,9 +420,6 @@ def test_masac_isaacsim_configuration(
         max_episode_steps=50,
         verbose=False
     )
-
-    # IMPORTANT: Relax reshuffling thresholds to trigger more reshuffles during testing
-    # Default thresholds are too conservative for typical cube layouts
     print("[TEST] Relaxing reshuffling thresholds for testing...")
     two_agent_env.reshuffle_decision.min_reachable_distance = 0.30  # Was 0.35
     two_agent_env.reshuffle_decision.max_reachable_distance = 0.90  # Was 0.85
@@ -494,14 +435,8 @@ def test_masac_isaacsim_configuration(
     print("[TEST] Enabling test mode for fast PCA fitting...")
     base_env.test_mode = True
     print("[TEST] Test mode enabled! Reachability checks will be skipped.")
-
-    # Fit PCA dimension adapter
     masac_agent.fit_dimension_adapter(two_agent_env, n_samples=500)
-    
-    # Set test mode
     masac_agent.set_test_mode(True)
-    
-    # Test episodes
     episode_results = []
 
     for episode in range(num_episodes):
@@ -534,30 +469,18 @@ def test_masac_isaacsim_configuration(
                 if i not in two_agent_env.base_env.objects_picked
                 and two_agent_env.reshuffle_count_per_cube.get(i, 0) < 2
             ]
-
-            # MASAC selects reshuffling action with action masking
             action_dict = masac_agent.select_action(obs, deterministic=True, valid_cubes=valid_cubes)
-
-            # Skip if no valid action
             if action_dict is None:
                 print(f"  [WARNING] No valid cubes to reshuffle, skipping step")
                 break
-
-            # Convert dictionary action to integer action for TwoAgentEnv
             action_int = two_agent_env.reshuffle_action_space.encode_action(
                 cube_idx=action_dict['cube_idx'],
                 grid_x=action_dict['target_grid_x'],
                 grid_y=action_dict['target_grid_y']
             )
-
-            # DEBUG: Print step info
             print(f"\n[DEBUG Step {episode_length+1}]")
             print(f"  MASAC action: cube={action_dict['cube_idx']}, grid=({action_dict['target_grid_x']}, {action_dict['target_grid_y']})")
-
-            # Execute action in environment
             next_obs, reward, done, truncated, info = two_agent_env.step(action_int)
-
-            # DEBUG: Print step results
             print(f"  DDQN selected: cube {info.get('agent1_action', 'N/A')}")
             print(f"  Reshuffle decision: {info.get('reshuffle_reason', 'N/A')}")
             print(f"  Reshuffled: {info.get('reshuffled_this_step', False)}")
@@ -589,11 +512,7 @@ def test_masac_isaacsim_configuration(
               f"Reshuffles={reshuffles_performed}, "
               f"Distance={two_agent_env.total_distance_reduced:.3f}m, "
               f"Cubes={len(two_agent_env.base_env.objects_picked)}/{num_cubes}")
-
-    # Save results
     save_results("rrt_isaacsim", grid_size, num_cubes, episode_results, log_dir)
-
-    # Don't close simulation_app here - will be closed in main()
 
     return episode_results
 
@@ -603,8 +522,6 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_path = Path(log_dir)
     log_path.mkdir(parents=True, exist_ok=True)
-
-    # Save Episode-level CSV
     csv_filename = f"masac_{env_type}_grid{grid_size}_cubes{num_cubes}_{timestamp}_episode_log.csv"
     csv_path = log_path / csv_filename
 
@@ -613,7 +530,7 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
         writer.writeheader()
         writer.writerows(episode_results)
 
-    print(f"✅ Saved episode CSV log: {csv_path}")
+    print(f" Saved episode CSV log: {csv_path}")
 
     # NEW: Save Timestep-level CSV
     if timestep_results:
@@ -625,9 +542,7 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
             writer.writeheader()
             writer.writerows(timestep_results)
 
-        print(f"✅ Saved timestep CSV log: {timestep_csv_path}")
-
-    # Save JSON summary
+        print(f" Saved timestep CSV log: {timestep_csv_path}")
     summary = {
         'env_type': env_type,
         'grid_size': grid_size,
@@ -647,7 +562,7 @@ def save_results(env_type: str, grid_size: int, num_cubes: int, episode_results:
     with open(json_path, 'w') as f:
         json.dump(summary, f, indent=2)
 
-    print(f"✅ Saved JSON summary: {json_path}")
+    print(f" Saved JSON summary: {json_path}")
 
 
 def main():
@@ -695,7 +610,7 @@ def main():
                 print(f"[CLEANUP] Warning: Could not clear stage: {cleanup_error}")
 
         except Exception as e:
-            print(f"❌ Error testing grid{grid_size} cubes{num_cubes}: {e}")
+            print(f" Error testing grid{grid_size} cubes{num_cubes}: {e}")
             import traceback
             traceback.print_exc()
 
@@ -707,7 +622,6 @@ def main():
             except:
                 pass
 
-    # Print summary
     print(f"\n{'='*80}")
     print("MASAC TESTING COMPLETE")
     print(f"{'='*80}")
@@ -732,7 +646,7 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print(f"\n❌ FATAL ERROR: {e}")
+        print(f"\n FATAL ERROR: {e}")
         import traceback
         traceback.print_exc()
 
