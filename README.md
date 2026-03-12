@@ -234,7 +234,7 @@ Parameters:
 - `--use_wandb`: Enable Weights & Biases logging
 - `--device`: Device to use (cuda/cpu, default: cuda)
 
-## Testing and Evaluation
+## Testing
 
 ### Test DDQN + mGAT System (Isaac Sim)
 
