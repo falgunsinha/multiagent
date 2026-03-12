@@ -203,7 +203,7 @@ pip install torch-geometric torch-scatter torch-sparse torch-cluster -f https://
 ### Step 4: Install NVIDIA Isaac Sim 5.0.0
 
 Follow the official NVIDIA Isaac Sim installation guide:
-https://docs.omniverse.nvidia.com/isaacsim/latest/installation.html
+https://docs.isaacsim.omniverse.nvidia.com/5.0.0/installation/quick-install.html
 
 
 ## Training
