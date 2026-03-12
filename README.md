@@ -151,14 +151,14 @@ Multiple agents cooperate for high-level decision making. Tasks are decomposed i
 
 ### Core Directories
 
-- `src/` - Core source code modules
-  - `rl/` - Reinforcement learning implementations
+- `src/` - Source code modules
+  - `rl/` - Reinforcement learning implementation
     - `doubleDQN/` - Double DQN agent and replay buffer
     - `object_selection_env.py` - Custom Gymnasium environment
     - `path_estimators.py` - path planning
     - `visual_grid.py` - Grid visualization utilities
   - `controllers/` - Robot controllers (PID, impedance)
-  - `manipulators/` - Robot manipulator interfaces (UR10, Franka)
+  - `manipulators/` - Robot manipulator interfaces
   - `grippers/` - Gripper control modules (parallel, suction)
   - `sensors/` - Sensor interfaces (cameras, LiDAR)
   - `utils/` - Utility functions (splines, transformations)
@@ -168,7 +168,6 @@ Multiple agents cooperate for high-level decision making. Tasks are decomposed i
     - `doubleDQN_script/` - DDQN training scripts
     - `MASAC/` - Multi-agent SAC implementation
     - `MARL/src/gat_cvd/` - Graph Attention Network implementation
-    - `rrt_rl_episode_viz.py` - RRT episode visualization
   - `RRT/` - RRT path planning scripts
   - `Cobot_Trajectory_Generator/` - Trajectory generation tools
 
