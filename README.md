@@ -147,7 +147,7 @@ Multiple agents cooperate for high-level decision making. Tasks are decomposed i
 - C-space trajectory generation
 
 
-## Project Structure
+## Directory Structure
 
 ### Core Directories
 
